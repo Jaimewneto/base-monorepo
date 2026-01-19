@@ -111,7 +111,7 @@
             {/if}
           </Table.Head>
         {/each}
-        <Table.Head class="text-right">Ações</Table.Head>
+        <Table.Head class="-ml-3 h-8 data-[active=true]:text-primary font-bold text-right">Ações</Table.Head>
       </Table.Row>
 
       <Table.Row class="bg-muted/50 border-t">

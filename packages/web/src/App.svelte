@@ -1,64 +1,59 @@
 <script lang="ts">
-    // import { onMount } from "svelte";
-    import { Route, router } from "tinro";
-    import Navbar from "$lib/components/layout/Navbar.svelte";
-    import { Toaster } from "$lib/components/ui/sonner";
-    import { authStore } from "$lib/stores/auth";
-    import Home from "./routes/Home.svelte";
-    import Login from "./routes/Login.svelte";
-    import Products from "./routes/Products.svelte";
-    import Users from "./routes/Users.svelte";
-    import "./app.css";
+  import { Route, router } from "tinro";
 
-    let isDark = $state(true);
-    /*
-    onMount(() => {
-        auth.init();
-    });
-    */
+  import Navbar from "$lib/components/layout/Navbar.svelte";
+  import { Toaster } from "$lib/components/ui/sonner";
+  import { authStore } from "$lib/stores/auth";
 
-    // auth guard
-    $effect(() => {
-        const path = $router.path;
-        const { user } = $authStore;
+  import Home from "./routes/Home.svelte";
+  import Login from "./routes/Login.svelte";
+  import Product from "./routes/Product.svelte";
+  import User from "./routes/User.svelte";
+  import Warehouse from "./routes/Warehouse.svelte";
 
-        if (!path) return;
+  import "./app.css";
 
-        if (user && path === "/login") {
-            router.goto("/");
-            return;
-        }
+  let isDark = $state(true);
 
-        if (!user && path !== "/login") {
-            router.goto("/login");
-        }
-    });
+  $effect(() => {
+    const path = $router.path;
+    const { user } = $authStore;
 
-    $effect(() => {
-        document.documentElement.classList.toggle("dark", isDark);
-    });
+    if (!path) return;
 
-    const toggleTheme = () => {
-        isDark = !isDark;
-    };
+    if (user && path === "/login") {
+      router.goto("/");
+      return;
+    }
+
+    if (!user && path !== "/login") {
+      router.goto("/login");
+    }
+  });
+
+  $effect(() => {
+    document.documentElement.classList.toggle("dark", isDark);
+  });
+
+  const toggleTheme = () => {
+    isDark = !isDark;
+  };
 </script>
 
 {#if $authStore.user}
-    <div class="min-h-screen bg-background text-foreground">
-        <div class="flex flex-col min-h-screen">
-            <Navbar {toggleTheme} {isDark} />
-            <main class="container mx-auto p-6 flex-1">
-                <!-- @ts-ignore -->
-                <Route path="/"><Home /></Route>
-                <!-- @ts-ignore -->
-                <Route path="/users"><Users /></Route>
-                <!-- @ts-ignore -->
-                <Route path="/products"><Products /></Route>
-            </main>
-        </div>
+  <div class="min-h-screen bg-background text-foreground">
+    <div class="flex flex-col min-h-screen">
+      <Navbar {toggleTheme} {isDark} />
+      <main class="container mx-auto p-6 flex-1">
+        <Route path="/"><Home /></Route>
+        <Route path="/users"><User /></Route>
+        <Route path="/products"><Product /></Route>
+        <Route path="/warehouses"><Warehouse /></Route>
+      </main>
     </div>
+  </div>
 {:else}
-    <Login />
+  <Login />
 {/if}
 
 <Toaster richColors position="top-right" />

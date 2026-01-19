@@ -22,12 +22,12 @@ export const warehouseRequestsValidations = () => {
 
     const create = z.object({
         description: z.string().min(2).max(100),
-        observations: z.string().min(2).max(100).optional(),
+        observations: z.string().min(2).max(100).nullable().optional(),
     } satisfies CheckSchema<WarehouseCreateWithoutCompanyId>);
 
     const updateById = z.object({
         description: z.string().min(2).max(100),
-        observations: z.string().min(2).max(100).optional(),
+        observations: z.string().min(2).max(100).nullable().optional(),
     } satisfies CheckSchema<WarehouseUpdate>);
 
     const deleteById = z.object({

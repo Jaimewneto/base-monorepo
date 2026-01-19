@@ -52,8 +52,9 @@
         sort: currentQuery.sort,
       });
       products = data;
-    } catch (err) {
-      toast.error("Erro ao carregar produtos");
+    } catch (error) {
+      if (error instanceof Error) toast.error(error.message);
+      else toast.error("Erro ao carregar produtos");
     } finally {
       loading = false;
     }
@@ -98,8 +99,8 @@
       open = false;
       await loadProducts();
       toast.success("Produto salvo com sucesso");
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Erro ao salvar produto");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erro ao salvar produto");
     } finally {
       saving = false;
     }
@@ -113,8 +114,8 @@
       deleteDialogOpen = false;
       await loadProducts();
       toast.success("Produto excluido com sucesso");
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Erro ao excluir produto");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erro ao excluir produto");
     } finally {
       deleting = false;
       productToDelete = null;
