@@ -13,8 +13,28 @@ const initialState: AuthState = {
     credentials: null,
 };
 
+function getInitialState(): AuthState {
+    if (typeof window === "undefined") return initialState;
+
+    const rawCredentials = localStorage.getItem("credentials");
+    const rawUser = localStorage.getItem("user");
+
+    if (rawCredentials && rawUser && rawCredentials !== "undefined" && rawUser !== "undefined") {
+        try {
+            return {
+                credentials: JSON.parse(rawCredentials),
+                user: JSON.parse(rawUser)
+            };
+        } catch {
+            return initialState;
+        }
+    }
+
+    return initialState;
+}
+
 function createAuthStore() {
-    const { subscribe, set, update } = writable<AuthState>(initialState);
+    const { subscribe, set, update } = writable<AuthState>(getInitialState());
 
     return {
         subscribe,
@@ -67,4 +87,4 @@ function createAuthStore() {
     };
 }
 
-export const auth = createAuthStore();
+export const authStore = createAuthStore();

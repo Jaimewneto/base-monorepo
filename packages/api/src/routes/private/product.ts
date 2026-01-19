@@ -86,7 +86,7 @@ export const productRoutes = new Hono()
     )
     .delete(
         "/:id",
-        zodValidate({ target: "json", schema: validations.deleteById }),
+        zodValidate({ target: "param", schema: validations.deleteById }),
         async (c) => {
             const { id } = c.req.valid("param");
 

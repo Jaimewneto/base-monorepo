@@ -2,7 +2,7 @@
     import { LogOut, Moon, Sun } from "@lucide/svelte";
     import { router } from "tinro";
     import { Button } from "$lib/components/ui/button";
-    import { auth } from "$lib/stores/auth";
+    import { authStore } from "$lib/stores/auth";
 
     interface Props {
         toggleTheme: () => void;
@@ -12,7 +12,7 @@
     const { toggleTheme, isDark }: Props = $props();
 
     const handleLogout = () => {
-        auth.clear();
+        authStore.clear();
         router.goto("/login");
     };
 </script>

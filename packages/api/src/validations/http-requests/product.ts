@@ -28,14 +28,14 @@ export const productRequestsValidations = () => {
         description: z.string().min(2).max(100),
         internal_code: z.string().min(2).max(100),
         sku: z.string().min(2).max(100),
-        observations: z.string().min(2).max(100).optional(),
+        observations: z.string().min(2).max(100).nullable().optional(),
     } satisfies CheckSchema<ProductCreateWithoutCompanyId>);
 
     const updateById = z.object({
         description: z.string().min(2).max(100),
         internal_code: z.string().min(2).max(100),
         sku: z.string().min(2).max(100),
-        observations: z.string().min(2).max(100).optional(),
+        observations: z.string().min(2).max(100).nullable().optional(),
     } satisfies CheckSchema<ProductUpdate>);
 
     const deleteById = z.object({

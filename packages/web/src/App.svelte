@@ -2,7 +2,8 @@
     // import { onMount } from "svelte";
     import { Route, router } from "tinro";
     import Navbar from "$lib/components/layout/Navbar.svelte";
-    import { auth } from "$lib/stores/auth";
+    import { Toaster } from "$lib/components/ui/sonner";
+    import { authStore } from "$lib/stores/auth";
     import Home from "./routes/Home.svelte";
     import Login from "./routes/Login.svelte";
     import Products from "./routes/Products.svelte";
@@ -19,7 +20,7 @@
     // auth guard
     $effect(() => {
         const path = $router.path;
-        const { user } = $auth;
+        const { user } = $authStore;
 
         if (!path) return;
 
@@ -42,7 +43,7 @@
     };
 </script>
 
-{#if $auth.user}
+{#if $authStore.user}
     <div class="min-h-screen bg-background text-foreground">
         <div class="flex flex-col min-h-screen">
             <Navbar {toggleTheme} {isDark} />
@@ -59,3 +60,5 @@
 {:else}
     <Login />
 {/if}
+
+<Toaster richColors position="top-right" />
