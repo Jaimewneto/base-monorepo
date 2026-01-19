@@ -11,6 +11,7 @@ import { getCurrentRequestUser } from "../../request-context.js";
 import { hasCompanyIdColumn } from "../../utils/repository.js";
 import { client } from "../client.js";
 import type { Database } from "../schema/index.js";
+import type { BaseRepository } from "../../types/repository.js";
 
 export const baseRepository = <K extends keyof Database>({
     db = client,
@@ -204,7 +205,7 @@ export const baseRepository = <K extends keyof Database>({
         return await query.executeTakeFirst();
     };
 
-    return {
+    const repository = {
         findOneById,
         findOneByCondition,
         findMany,
@@ -212,4 +213,6 @@ export const baseRepository = <K extends keyof Database>({
         updateById,
         deleteById,
     };
+
+    return repository satisfies BaseRepository<K>;
 };

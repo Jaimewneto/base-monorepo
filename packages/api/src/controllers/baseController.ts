@@ -12,14 +12,14 @@ import { BadRequestError } from "../error.js";
 import type { OrderBy } from "../types/http-query/orderBy.js";
 import type { Where } from "../types/http-query/where.js";
 import type { ZodSortMap, ZodWhereMap } from "../types/http-query/zod.js";
+import type { BaseService } from "../types/service.js";
 
 import { buildOrderBy, buildWhereExpression } from "../utils/http-query.js";
+import type { BaseController } from "../types/controller.js";
 
 export const baseController = <K extends keyof Database>(
-    service: ReturnType<
-        typeof import("../services/baseService.js").baseService<K>
-    >,
-) => {
+    service: BaseService<K>,
+): BaseController<K> => {
     const findOneById = async (id: string) => {
         const data = await service.findOneById(id);
 

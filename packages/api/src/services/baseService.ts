@@ -5,12 +5,12 @@ import type {
     Updateable,
 } from "kysely";
 import type { Database } from "../database/schema/index.js";
+import type { BaseRepository } from "../types/repository.js";
+import type { BaseService } from "../types/service.js";
 
 export const baseService = <K extends keyof Database>(
-    repository: ReturnType<
-        typeof import("../database/repositories/baseRepository.js").baseRepository<K>
-    >,
-) => {
+    repository: BaseRepository<K>,
+): BaseService<K> => {
     const findOneById = async (id: string) => {
         return await repository.findOneById(id);
     };
