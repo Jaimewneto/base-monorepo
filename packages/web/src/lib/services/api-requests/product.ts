@@ -16,7 +16,17 @@ export const productRequests = {
 
         return res.data;
     },
-    findMany: async ({ page, limit, where = { conditions: [] }, sort }: { page: number; limit: number, where: any, sort: any[] }) => {
+    findMany: async ({
+        page,
+        limit,
+        where = { conditions: [] },
+        sort,
+    }: {
+        page: number;
+        limit: number;
+        where: any;
+        sort: any[];
+    }) => {
         const authApi = getAuthenticatedApi();
 
         const req = await authApi.private.product.list.$post({
@@ -36,19 +46,27 @@ export const productRequests = {
 
         return { meta: res.meta, data: res.data };
     },
-    create: async ({ description, internal_code, sku, observations }: { description: string; internal_code: string; sku: string; observations?: string | null }) => {
+    create: async ({
+        description,
+        internal_code,
+        sku,
+        observations,
+    }: {
+        description: string;
+        internal_code: string;
+        sku: string;
+        observations?: string | null;
+    }) => {
         const authApi = getAuthenticatedApi();
 
-        const req = await authApi.private.product.$post(
-            {
-                json: {
-                    description,
-                    internal_code,
-                    sku,
-                    observations
-                },
-            }
-        );
+        const req = await authApi.private.product.$post({
+            json: {
+                description,
+                internal_code,
+                sku,
+                observations,
+            },
+        });
 
         if (!req) throw new Error("Request failed");
 
@@ -58,16 +76,28 @@ export const productRequests = {
 
         return res.data;
     },
-    updateOneById: async ({ id, description, internal_code, sku, observations }: { id: string; description: string; internal_code: string; sku: string; observations?: string | null }) => {
+    updateOneById: async ({
+        id,
+        description,
+        internal_code,
+        sku,
+        observations,
+    }: {
+        id: string;
+        description: string;
+        internal_code: string;
+        sku: string;
+        observations?: string | null;
+    }) => {
         const authApi = getAuthenticatedApi();
 
         const req = await authApi.private.product[":id"].$patch({
             param: { id },
             json: {
                 description,
-            internal_code,
-            sku,
-            observations,
+                internal_code,
+                sku,
+                observations,
             },
         });
 

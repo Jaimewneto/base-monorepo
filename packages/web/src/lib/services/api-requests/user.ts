@@ -22,7 +22,7 @@ export const userRequests = {
         const req = await authApi.private.user.list.$post({
             json: {
                 page,
-                limit
+                limit,
             },
         });
 
@@ -34,18 +34,24 @@ export const userRequests = {
 
         return { meta: res.meta, data: res.data };
     },
-    create: async ({ name, email, password }: { name: string; email: string; password: string }) => {
+    create: async ({
+        name,
+        email,
+        password,
+    }: {
+        name: string;
+        email: string;
+        password: string;
+    }) => {
         const authApi = getAuthenticatedApi();
 
-        const req = await authApi.private.user.$post(
-            {
-                json: {
-                    name,
-                    email,
-                    password,
-                },
-            }
-        );
+        const req = await authApi.private.user.$post({
+            json: {
+                name,
+                email,
+                password,
+            },
+        });
 
         if (!req) throw new Error("Request failed");
 
@@ -72,5 +78,5 @@ export const userRequests = {
         if (!res.success) throw new Error("Request failed");
 
         return res.data;
-    }
+    },
 };

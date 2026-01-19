@@ -16,7 +16,17 @@ export const warehouseRequests = {
 
         return res.data;
     },
-    findMany: async ({ page, limit, where = { conditions: [] }, sort }: { page: number; limit: number, where: any, sort: any[] }) => {
+    findMany: async ({
+        page,
+        limit,
+        where = { conditions: [] },
+        sort,
+    }: {
+        page: number;
+        limit: number;
+        where: any;
+        sort: any[];
+    }) => {
         const authApi = getAuthenticatedApi();
 
         const req = await authApi.private.warehouse.list.$post({
@@ -36,17 +46,21 @@ export const warehouseRequests = {
 
         return { meta: res.meta, data: res.data };
     },
-    create: async ({ description, observations }: { description: string; observations?: string | null }) => {
+    create: async ({
+        description,
+        observations,
+    }: {
+        description: string;
+        observations?: string | null;
+    }) => {
         const authApi = getAuthenticatedApi();
 
-        const req = await authApi.private.warehouse.$post(
-            {
-                json: {
-                    description,
-                    observations,
-                },
-            }
-        );
+        const req = await authApi.private.warehouse.$post({
+            json: {
+                description,
+                observations,
+            },
+        });
 
         if (!req) throw new Error("Request failed");
 
@@ -56,7 +70,15 @@ export const warehouseRequests = {
 
         return res.data;
     },
-    updateOneById: async ({ id, description, observations }: { id: string; description: string; observations?: string | null }) => {
+    updateOneById: async ({
+        id,
+        description,
+        observations,
+    }: {
+        id: string;
+        description: string;
+        observations?: string | null;
+    }) => {
         const authApi = getAuthenticatedApi();
 
         const req = await authApi.private.warehouse[":id"].$patch({

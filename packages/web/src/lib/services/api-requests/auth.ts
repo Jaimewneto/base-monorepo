@@ -1,8 +1,8 @@
 import { api, getAuthenticatedApi } from "../api.client";
 
 export const authRequests = {
-    login: async ({ email, password }: { email: string, password: string }) => {
-            const req = await api.public.auth.login.$post({
+    login: async ({ email, password }: { email: string; password: string }) => {
+        const req = await api.public.auth.login.$post({
             json: { email, password },
         });
 
@@ -30,5 +30,5 @@ export const authRequests = {
         if (!res.success) throw new Error("Request failed");
 
         return res.data;
-    }
+    },
 };

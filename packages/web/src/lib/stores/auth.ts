@@ -19,11 +19,16 @@ function getInitialState(): AuthState {
     const rawCredentials = localStorage.getItem("credentials");
     const rawUser = localStorage.getItem("user");
 
-    if (rawCredentials && rawUser && rawCredentials !== "undefined" && rawUser !== "undefined") {
+    if (
+        rawCredentials &&
+        rawUser &&
+        rawCredentials !== "undefined" &&
+        rawUser !== "undefined"
+    ) {
         try {
             return {
                 credentials: JSON.parse(rawCredentials),
-                user: JSON.parse(rawUser)
+                user: JSON.parse(rawUser),
             };
         } catch {
             return initialState;
