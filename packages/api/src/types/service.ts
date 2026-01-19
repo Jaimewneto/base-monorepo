@@ -26,9 +26,7 @@ export interface BaseService<K extends keyof Database> {
         }[];
     }): Promise<{ count: number; list: Selectable<Database[K]>[] }>;
 
-    create(
-        data: Insertable<Database[K]>,
-    ): Promise<Selectable<Database[K]>>;
+    create(data: Insertable<Database[K]>): Promise<Selectable<Database[K]>>;
 
     updateById(params: {
         id: string;

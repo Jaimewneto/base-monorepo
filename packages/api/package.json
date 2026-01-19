@@ -16,7 +16,7 @@
         "start": "node --env-file=.env dist/index.js",
         "lint": "pnpm biome lint .",
         "format": "pnpm biome format --write .",
-        "check": "pnpm biome check --write .",
+        "check": "pnpm biome check --write --max-diagnostics=1000 .",
         "db:migrate": "tsx --env-file=.env src/database/scripts/migrate.ts"
     },
     "dependencies": {

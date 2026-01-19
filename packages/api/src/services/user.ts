@@ -4,7 +4,7 @@ import type { SqlBool } from "kysely";
 import { userRepository } from "../database/repositories/user.js";
 
 import type { UserCreate } from "../database/schema/user.js";
-
+import { userRules } from "../rules/user.js";
 import { baseService } from "./baseService.js";
 
 const base = baseService<"user">(userRepository());
@@ -22,6 +22,8 @@ export const userService = {
     },
 
     create: async (user: UserCreate) => {
+        await userRules().validateEmailUniqueness(user.email);
+
         const hashedPassword = await hash(user.password);
 
         user.password = hashedPassword;

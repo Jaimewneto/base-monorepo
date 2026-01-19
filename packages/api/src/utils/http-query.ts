@@ -46,7 +46,7 @@ const buildCondition = <K extends keyof Database>(
                 eb.fn("unaccent", [ref]),
                 operator,
                 eb.fn("unaccent", [sql`${condition.value}`]),
-            )
+            );
 
         case "in":
         case "not in":

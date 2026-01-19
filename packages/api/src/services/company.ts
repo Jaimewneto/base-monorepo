@@ -7,7 +7,7 @@ import { userRepository } from "../database/repositories/user.js";
 
 import type { CompanyCreate } from "../database/schema/company.js";
 import type { UserCreateWithoutCompanyId } from "../database/schema/user.js";
-
+import { userRules } from "../rules/user.js";
 import { baseService } from "./baseService.js";
 
 const base = baseService<"company">(companyRepository(client));
@@ -28,6 +28,8 @@ export const companyService = {
             const company = await base.create(data.company);
 
             const hashedPassword = await hash(password);
+
+            await userRules(trx).validateEmailUniqueness(email);
 
             const user = await userRepositoryInstance.create({
                 email,

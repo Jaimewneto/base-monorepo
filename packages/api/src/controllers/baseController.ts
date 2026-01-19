@@ -8,14 +8,12 @@ import type {
 import type { Database } from "../database/schema/index.js";
 
 import { BadRequestError } from "../error.js";
-
+import type { BaseController } from "../types/controller.js";
 import type { OrderBy } from "../types/http-query/orderBy.js";
 import type { Where } from "../types/http-query/where.js";
 import type { ZodSortMap, ZodWhereMap } from "../types/http-query/zod.js";
 import type { BaseService } from "../types/service.js";
-
 import { buildOrderBy, buildWhereExpression } from "../utils/http-query.js";
-import type { BaseController } from "../types/controller.js";
 
 export const baseController = <K extends keyof Database>(
     service: BaseService<K>,
