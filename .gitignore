@@ -1,0 +1,126 @@
+# ========================================
+# Dependencies
+# ========================================
+node_modules/
+.pnp
+.pnp.js
+.yarn/
+!.yarn/releases
+.pnpm-store/
+
+# ========================================
+# Build outputs
+# ========================================
+dist/
+dist-ssr/
+build/
+.svelte-kit/
+.turbo/
+*.tsbuildinfo
+
+# ========================================
+# Environment variables
+# ========================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.production
+*.local
+
+# ========================================
+# Logs
+# ========================================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ========================================
+# Testing
+# ========================================
+coverage/
+.nyc_output/
+*.lcov
+
+# ========================================
+# IDE / Editor
+# ========================================
+# VSCode
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/*.code-snippets
+
+# JetBrains (WebStorm, IntelliJ, etc)
+.idea/workspace.xml
+.idea/usage.statistics.xml
+.idea/shelf
+.idea/tasks.xml
+.idea/dictionaries
+*.iml
+*.iws
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# ========================================
+# OS
+# ========================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ========================================
+# Temporary files
+# ========================================
+*.tmp
+*.temp
+*.cache
+.cache/
+
+# ========================================
+# Misc
+# ========================================
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

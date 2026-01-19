@@ -1,0 +1,19 @@
+{
+    "name": "base-monorepo",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "dev": "pnpm --filter \"./packages/**\" --parallel dev",
+        "dev:api": "pnpm --filter api dev",
+        "dev:web": "pnpm --filter web dev",
+        "build": "pnpm build:api && pnpm build:client && pnpm build:web",
+        "build:api": "pnpm --filter api build",
+        "build:client": "pnpm --filter api-client build",
+        "build:web": "pnpm --filter web build",
+        "lint": "pnpm --filter \"./packages/**\" lint",
+        "format": "pnpm --filter \"./packages/**\" format"
+    },
+    "devDependencies": {
+        "typescript": "^5.8.3"
+    }
+}
