@@ -8,17 +8,31 @@
   import { toast } from "svelte-sonner";
   import * as AlertDialog from "$lib/components/ui/alert-dialog";
   import { productRequests } from "$lib/services/api-requests/product";
-  import { Loader2, UserPlus, Pencil, Save, Trash2 } from "@lucide/svelte";
+  import { Loader2, Pencil, Save, Trash2, PackagePlus } from "@lucide/svelte";
   import type { Product } from "$lib/types/api-returns/product";
+
+  // Importando o seu componente DataTable
+  import DataTable, { type Column } from "$lib/components/DataTable.svelte";
 
   // Estados da Lista
   let products = $state<Product[]>([]);
   let loading = $state(true);
 
+  // Definição das colunas para o seu DataTable
+  const columns: Column[] = [
+    { label: "Descrição", field: "product.description", operator: "ilike", valueType: "string", sortable: true, filterable: true },
+    { label: "Código interno", field: "product.internal_code", operator: "ilike", valueType: "string", sortable: true, filterable: true },
+    { label: "SKU", field: "product.sku", operator: "ilike", valueType: "string", sortable: true, filterable: true },
+    { label: "Observações", field: "product.observations", operator: "ilike", valueType: "string", sortable: true, filterable: true },
+  ];
+
+  // Estado para armazenar a query atual
+  let currentQuery = $state({ where: { conditions: [] } as any, sort: [] as any[] });
+
   // Estados do Formulário (Modal)
   let open = $state(false);
   let saving = $state(false);
-  let productToEdit = $state<Product | null>(null); // Se null, é criação. Se tem objeto, é edição.
+  let productToEdit = $state<Product | null>(null);
 
   // Campos do Form
   let formData = $state({ description: "", internal_code: "", sku: "", observations: null as string | null });
@@ -31,11 +45,23 @@
   async function loadProducts() {
     loading = true;
     try {
-      const { data } = await productRequests.findMany({ page: 1, limit: 100 });
+      const { data } = await productRequests.findMany({
+        page: 1,
+        limit: 100,
+        where: currentQuery.where,
+        sort: currentQuery.sort,
+      });
       products = data;
+    } catch (err) {
+      toast.error("Erro ao carregar produtos");
     } finally {
       loading = false;
     }
+  }
+
+  function handleQueryChange(params: { where: any; sort: any }) {
+    currentQuery = params;
+    loadProducts();
   }
 
   function openCreate() {
@@ -46,7 +72,12 @@
 
   function openEdit(product: Product) {
     productToEdit = product;
-    formData = { description: product.description, internal_code: product.internal_code, sku: product.sku, observations: product.observations as string | null }; // Senha vazia na edição
+    formData = {
+      description: product.description,
+      internal_code: product.internal_code,
+      sku: product.sku,
+      observations: product.observations as string | null,
+    };
     open = true;
   }
 
@@ -60,16 +91,12 @@
     saving = true;
     try {
       if (productToEdit) {
-        // Modo Edição
         await productRequests.updateOneById({ id: productToEdit.id, ...formData });
       } else {
-        // Modo Criação
         await productRequests.create(formData);
       }
-
       open = false;
-      await loadProducts(); // Recarrega a lista
-
+      await loadProducts();
       toast.success("Produto salvo com sucesso");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erro ao salvar produto");
@@ -78,14 +105,13 @@
     }
   }
 
-  // Ação real de deletar (Backend Call)
   async function handleDelete() {
     if (!productToDelete) return;
     deleting = true;
     try {
       await productRequests.deleteOneById(productToDelete.id);
       deleteDialogOpen = false;
-      await loadProducts(); // Recarrega a lista
+      await loadProducts();
       toast.success("Produto excluido com sucesso");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erro ao excluir produto");
@@ -102,41 +128,30 @@
   <div class="flex items-center justify-between">
     <h2 class="text-3xl font-bold tracking-tight">Produtos</h2>
     <Button size="sm" onclick={openCreate}>
-      <UserPlus class="mr-2 h-4 w-4" /> Novo produto
+      <PackagePlus class="mr-2 h-4 w-4" /> Novo produto
     </Button>
   </div>
 
-  <div class="rounded-md border bg-card">
-    <Table.Root>
-      <Table.Header>
-        <Table.Row>
-          <Table.Head>Descrição</Table.Head>
-          <Table.Head>Código interno</Table.Head>
-          <Table.Head>SKU</Table.Head>
-          <Table.Head>Observações</Table.Head>
-          <Table.Head class="text-right">Ações</Table.Head>
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>
-        {#each products as product}
-          <Table.Row>
-            <Table.Cell>{product.description}</Table.Cell>
-            <Table.Cell>{product.internal_code}</Table.Cell>
-            <Table.Cell>{product.sku}</Table.Cell>
-            <Table.Cell>{product.observations}</Table.Cell>
-            <Table.Cell class="text-right">
-              <Button variant="ghost" size="icon" onclick={() => openEdit(product)}>
-                <Pencil class="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon" class="hover:text-destructive" onclick={() => confirmDelete(product)}>
-                <Trash2 class="h-4 w-4" />
-              </Button>
-            </Table.Cell>
-          </Table.Row>
-        {/each}
-      </Table.Body>
-    </Table.Root>
-  </div>
+  <DataTable {columns} data={products} {loading} onQueryChange={handleQueryChange}>
+    {#each products as product}
+      <Table.Row>
+        <Table.Cell>{product.description}</Table.Cell>
+        <Table.Cell>{product.internal_code}</Table.Cell>
+        <Table.Cell>{product.sku}</Table.Cell>
+        <Table.Cell>{product.observations ?? "-"}</Table.Cell>
+        <Table.Cell class="text-right">
+          <div class="flex justify-end gap-2">
+            <Button variant="ghost" size="icon" onclick={() => openEdit(product)}>
+              <Pencil class="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="icon" class="hover:text-destructive" onclick={() => confirmDelete(product)}>
+              <Trash2 class="h-4 w-4" />
+            </Button>
+          </div>
+        </Table.Cell>
+      </Table.Row>
+    {/each}
+  </DataTable>
 </div>
 
 <Sheet.Root bind:open>
@@ -156,17 +171,17 @@
 
       <div class="grid gap-2">
         <Label for="internal_code">Código interno</Label>
-        <Input id="internal_code" type="internal_code" bind:value={formData.internal_code} disabled={!!productToEdit} placeholder="Ex: 000001" required />
+        <Input id="internal_code" bind:value={formData.internal_code} disabled={!!productToEdit} placeholder="Ex: 000001" required />
       </div>
 
       <div class="grid gap-2">
         <Label for="sku">SKU</Label>
-        <Input id="sku" type="sku" bind:value={formData.sku} required />
+        <Input id="sku" bind:value={formData.sku} required />
       </div>
 
       <div class="grid gap-2">
         <Label for="observations">Observações</Label>
-        <Input id="observations" type="observations" bind:value={formData.observations} placeholder="Observações sobre o produto" />
+        <Input id="observations" bind:value={formData.observations} placeholder="Observações sobre o produto" />
       </div>
 
       <div class="flex justify-end gap-3 mt-4">
@@ -191,17 +206,13 @@
       <AlertDialog.Title>Você tem certeza?</AlertDialog.Title>
       <AlertDialog.Description>
         Esta ação não pode ser desfeita. Isso excluirá permanentemente o produto
-        <span class="font-bold text-foreground">{productToDelete?.description}</span> 
+        <span class="font-bold text-foreground">{productToDelete?.description}</span>
         e removerá os dados de nossos servidores.
       </AlertDialog.Description>
     </AlertDialog.Header>
     <AlertDialog.Footer>
       <AlertDialog.Cancel disabled={deleting}>Cancelar</AlertDialog.Cancel>
-      <AlertDialog.Action 
-        onclick={handleDelete} 
-        class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-        disabled={deleting}
-      >
+      <AlertDialog.Action onclick={handleDelete} class="bg-destructive text-destructive-foreground hover:bg-destructive/90" disabled={deleting}>
         {#if deleting}
           <Loader2 class="mr-2 h-4 w-4 animate-spin" />
           Excluindo...

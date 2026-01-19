@@ -38,9 +38,15 @@ const buildCondition = <K extends keyof Database>(
         case ">=":
         case "<":
         case "<=":
+            return eb(ref, operator, condition.value as any); // Could be better...
+
         case "like":
         case "ilike":
-            return eb(ref, operator, condition.value as any); // Could be better...
+            return eb(
+                eb.fn("unaccent", [ref]),
+                operator,
+                eb.fn("unaccent", [sql`${condition.value}`]),
+            )
 
         case "in":
         case "not in":

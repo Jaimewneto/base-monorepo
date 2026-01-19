@@ -16,13 +16,15 @@ export const productRequests = {
 
         return res.data;
     },
-    findMany: async ({ page, limit }: { page: number; limit: number }) => {
+    findMany: async ({ page, limit, where = { conditions: [] }, sort }: { page: number; limit: number, where: any, sort: any[] }) => {
         const authApi = getAuthenticatedApi();
 
         const req = await authApi.private.product.list.$post({
             json: {
                 page,
-                limit
+                limit,
+                where,
+                sort,
             },
         });
 
