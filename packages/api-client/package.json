@@ -16,9 +16,7 @@
     },
     "dependencies": {
         "@base-monorepo/api": "workspace:*",
-        "hono": "^4.11.3",
-        "pino": "^10.2.0",
-        "zod": "^4.3.5"
+        "hono": "^4.11.3"
     },
     "devDependencies": {
         "@types/node": "^25.0.9",
