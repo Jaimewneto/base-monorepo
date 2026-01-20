@@ -5,22 +5,57 @@
   import { Button } from "$lib/components/ui/button";
   import { ArrowUpDown, Loader2 } from "@lucide/svelte";
 
-  export interface Column {
+  /**
+   * Extrai os campos possíveis do where.conditions
+   */
+  export type WhereField<T> = T extends { conditions: (infer C)[] }
+    ? C extends { field: infer F }
+      ? F
+      : C extends { conditions: { field: infer F }[] }
+        ? F
+        : never
+    : never;
+
+  /**
+   * Coluna tipada pelo campo válido do WHERE
+   */
+  type BaseColumn = {
     label: string;
-    field: string;
     operator: "ilike" | "=" | ">" | "<" | ">=" | "<=";
     valueType: "string" | "number" | "date";
-    sortable?: boolean;
-    filterable?: boolean;
-  }
+  };
 
-  let { columns, data, loading, onQueryChange, children } = $props<{
-    columns: Column[];
+  type ActiveColumn<Field extends string> = BaseColumn & {
+    field: Field;
+    sortable?: true;
+    filterable?: true;
+  };
+
+  type PassiveColumn = BaseColumn & {
+    field?: string;
+    sortable: false;
+    filterable: false;
+  };
+
+  export type Column<Field extends string> = ActiveColumn<Field> | PassiveColumn;
+
+  /**
+   * Props genéricas da DataTable
+   */
+  type DataTableProps<Field extends string, W, S> = {
+    columns: Column<Field>[];
     data: any[];
     loading: boolean;
-    onQueryChange: (params: { where: any; sort: any }) => void;
+    onQueryChange: (params: { where: W; sort: S }) => void;
     children: Snippet;
-  }>();
+  };
+
+  /**
+   * ⚠️ IMPORTANTE:
+   * Aqui o componente continua genérico.
+   * Quem usa ele é que injeta W e S concretos
+   */
+  let { columns, data, loading, onQueryChange, children }: DataTableProps<string, any, any> = $props();
 
   let filters = $state<Record<string, string>>({});
   let sortField = $state<string | null>(null);
@@ -30,19 +65,18 @@
     const conditions = Object.entries(filters)
       .filter(([_, value]) => value !== "" && value !== undefined)
       .map(([field, value]) => {
-        // Encontra a configuração da coluna para saber o operador e o tipo
-        const col = columns.find((c: Column) => c.field === field);
+        const col = columns.find((c) => c.field === field);
         if (!col) return null;
 
         let finalValue: any = value;
 
-        // Tratamento de Tipo (Casting)
+        // Casting por tipo
         if (col.valueType === "number") {
           finalValue = Number(value);
-          if (isNaN(finalValue)) return null; // Aborta se não for número válido
+          if (isNaN(finalValue)) return null;
         }
 
-        // Tratamento de Operador (Wildcards)
+        // Wildcard para ilike
         if (col.operator === "ilike") {
           finalValue = `%${value}%`;
         }
@@ -53,15 +87,18 @@
           value: finalValue,
         };
       })
-      .filter(Boolean); // Remove os nulos
+      .filter(Boolean);
 
     onQueryChange({
-      where: { conditions: conditions.length > 0 ? conditions : [] },
+      where: {
+        conditions: conditions.length ? conditions : [],
+      },
       sort: sortField ? [{ field: sortField, direction: sortDirection }] : [],
     });
   }
 
   let timeout: any;
+
   function handleFilterInput(field: string, value: string) {
     filters[field] = value;
     clearTimeout(timeout);
@@ -111,7 +148,7 @@
             {/if}
           </Table.Head>
         {/each}
-        <Table.Head class="-ml-3 h-8 data-[active=true]:text-primary font-bold text-right">Ações</Table.Head>
+        <Table.Head class="text-right">Ações</Table.Head>
       </Table.Row>
 
       <Table.Row class="bg-muted/50 border-t">
@@ -127,7 +164,7 @@
             {/if}
           </Table.Head>
         {/each}
-        <Table.Head></Table.Head>
+        <Table.Head />
       </Table.Row>
     </Table.Header>
 

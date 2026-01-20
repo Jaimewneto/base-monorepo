@@ -12,7 +12,7 @@
   import type { Product, ProductWithStocks } from "$lib/types/api-returns/product";
 
   // Importando o seu componente DataTable
-  import DataTable, { type Column } from "$lib/components/DataTable.svelte";
+  import DataTable, { type Column, type WhereField } from "$lib/components/DataTable.svelte";
 
   import type { productFindManySortArgs, productFindManyWhereArgs } from "$lib/types/findManyArgs";
 
@@ -21,13 +21,13 @@
   let loading = $state(true);
 
   // Definição das colunas para o seu DataTable
-  const columns: Column[] = [
+  const columns = [
     { label: "Descrição", field: "product.description", operator: "ilike", valueType: "string", sortable: true, filterable: true },
     { label: "Código interno", field: "product.internal_code", operator: "ilike", valueType: "string", sortable: true, filterable: true },
     { label: "SKU", field: "product.sku", operator: "ilike", valueType: "string", sortable: true, filterable: true },
     { label: "Total em estoque", field: "product.total_in_stocks", operator: "=", valueType: "number", sortable: false, filterable: false },
     { label: "Observações", field: "product.observations", operator: "ilike", valueType: "string", sortable: true, filterable: true },
-  ];
+  ] satisfies Column<WhereField<NonNullable<productFindManyWhereArgs>>>[];
 
   // Estado para armazenar a query atual
   let currentQuery = $state({ where: { conditions: [] } as productFindManyWhereArgs, sort: [] as productFindManySortArgs });
