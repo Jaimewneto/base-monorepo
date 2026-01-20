@@ -23,7 +23,7 @@ export const login = async ({
         throw new BadRequestError({
             code: 401,
             message: "Wrong email or password",
-            name: "InvalidCError",
+            name: "InvalidCredentialsError",
         });
 
     const isValid = await verify(user.password, password);
@@ -42,7 +42,7 @@ export const login = async ({
     })
         .setProtectedHeader({ alg: "HS256" })
         .setIssuedAt()
-        .setExpirationTime("2h")
+        .setExpirationTime("1m")
         .sign(new TextEncoder().encode(env.JWT_SECRET));
 
     const refreshToken = await new jose.SignJWT({

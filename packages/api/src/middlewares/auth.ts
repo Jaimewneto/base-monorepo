@@ -35,10 +35,18 @@ export const authMiddleware = createMiddleware(async (c, next) => {
         await requestContext.run({ user: payload as JWTPayload }, async () => {
             await next();
         });
-    } catch {
+    } catch (error) {
+        if (error instanceof jose.errors.JWTExpired) {
+            throw new BadRequestError({
+                code: 401,
+                message: "Token expired",
+                name: "ExpiredTokenError",
+            });
+        }
+
         throw new BadRequestError({
             code: 401,
-            message: "Invalid or expired token",
+            message: "Invalid token",
             name: "UnauthorizedError",
         });
     }
