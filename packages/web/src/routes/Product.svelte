@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { toast } from "svelte-sonner";
-  import { Loader2, Pencil, Save, Trash2, PackagePlus } from "@lucide/svelte";
+  import { Loader2, Pencil, Save, Trash2, PackagePlus, Warehouse } from "@lucide/svelte";
 
   import { Button } from "$lib/components/ui/button";
   import * as Table from "$lib/components/ui/table";
@@ -48,6 +48,15 @@
   let deleteDialogOpen = $state(false);
   let productToDelete = $state<Product | null>(null);
   let deleting = $state(false);
+
+  // Estados para Visualização de Estoque Detalhado
+  let stockSheetOpen = $state(false);
+  let selectedProductStocks = $state<ProductWithStocks | null>(null);
+
+  function openStockDetails(product: ProductWithStocks) {
+    selectedProductStocks = product;
+    stockSheetOpen = true;
+  }
 
   async function loadProducts() {
     loading = true;
@@ -146,7 +155,14 @@
         <Table.Cell>{product.description}</Table.Cell>
         <Table.Cell>{product.internal_code}</Table.Cell>
         <Table.Cell>{product.sku}</Table.Cell>
-        <Table.Cell>{product.total_in_stocks}</Table.Cell>
+        <Table.Cell>
+          <div class="flex items-center gap-2">
+            <span class="font-medium">{product.total_in_stocks}</span>
+            <Button variant="outline" size="icon" class="h-7 w-7" onclick={() => openStockDetails(product)} title="Ver distribuição por depósito">
+              <Warehouse class="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        </Table.Cell>
         <Table.Cell>{product.observations ?? "-"}</Table.Cell>
         <Table.Cell class="text-right">
           <div class="flex justify-end gap-2">
@@ -206,6 +222,54 @@
         </Button>
       </div>
     </form>
+  </Sheet.Content>
+</Sheet.Root>
+
+<Sheet.Root bind:open={stockSheetOpen}>
+  <Sheet.Content side="right" class="w-[400px]">
+    <Sheet.Header>
+      <Sheet.Title>Distribuição em Estoque</Sheet.Title>
+      <Sheet.Description>
+        Detalhamento do produto: <span class="font-bold text-foreground">{selectedProductStocks?.description}</span>
+      </Sheet.Description>
+    </Sheet.Header>
+
+    <div class="py-6">
+      <div class="rounded-md border">
+        <Table.Root>
+          <Table.Header>
+            <Table.Row>
+              <Table.Head>Estoque</Table.Head>
+              <Table.Head class="text-right">Qtd.</Table.Head>
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
+            {#if selectedProductStocks?.stocks && selectedProductStocks.stocks.length > 0}
+              {#each selectedProductStocks.stocks as stock}
+                <Table.Row>
+                  <Table.Cell class="font-medium">{stock.warehouse_description}</Table.Cell>
+                  <Table.Cell class="text-right">{stock.amount}</Table.Cell>
+                </Table.Row>
+              {/each}
+              <Table.Row class="bg-muted/50 font-bold">
+                <Table.Cell>Total Geral</Table.Cell>
+                <Table.Cell class="text-right">{selectedProductStocks.total_in_stocks}</Table.Cell>
+              </Table.Row>
+            {:else}
+              <Table.Row>
+                <Table.Cell colspan={2} class="text-center py-8 text-muted-foreground italic">
+                  Este produto não possui saldo em nenhum estoque.
+                </Table.Cell>
+              </Table.Row>
+            {/if}
+          </Table.Body>
+        </Table.Root>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-3 mt-4">
+      <Button variant="outline" onclick={() => (stockSheetOpen = false)} type="button">Voltar</Button>
+    </div>
   </Sheet.Content>
 </Sheet.Root>
 
