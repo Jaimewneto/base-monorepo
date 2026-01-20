@@ -30,7 +30,7 @@ export const productRoutes = new Hono()
         async (c) => {
             const { limit, page, where, sort } = c.req.valid("json");
 
-            const { list, count } = await productController.findMany({
+            const { list, count } = await productController.findManyWithStock({
                 limit,
                 page,
                 where,

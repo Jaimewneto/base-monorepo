@@ -9,13 +9,15 @@
   import * as AlertDialog from "$lib/components/ui/alert-dialog";
   import { productRequests } from "$lib/services/api-requests/product";
   import { Loader2, Pencil, Save, Trash2, PackagePlus } from "@lucide/svelte";
-  import type { Product } from "$lib/types/api-returns/product";
+  import type { Product, ProductWithStocks } from "$lib/types/api-returns/product";
 
   // Importando o seu componente DataTable
   import DataTable, { type Column } from "$lib/components/DataTable.svelte";
 
+  import type { productFindManySortArgs, productFindManyWhereArgs } from "$lib/types/findManyArgs";
+
   // Estados da Lista
-  let products = $state<Product[]>([]);
+  let products = $state<ProductWithStocks[]>([]);
   let loading = $state(true);
 
   // Definição das colunas para o seu DataTable
@@ -23,11 +25,12 @@
     { label: "Descrição", field: "product.description", operator: "ilike", valueType: "string", sortable: true, filterable: true },
     { label: "Código interno", field: "product.internal_code", operator: "ilike", valueType: "string", sortable: true, filterable: true },
     { label: "SKU", field: "product.sku", operator: "ilike", valueType: "string", sortable: true, filterable: true },
+    { label: "Total em estoque", field: "product.total_in_stocks", operator: "=", valueType: "number", sortable: false, filterable: false },
     { label: "Observações", field: "product.observations", operator: "ilike", valueType: "string", sortable: true, filterable: true },
   ];
 
   // Estado para armazenar a query atual
-  let currentQuery = $state({ where: { conditions: [] } as any, sort: [] as any[] });
+  let currentQuery = $state({ where: { conditions: [] } as productFindManyWhereArgs, sort: [] as productFindManySortArgs });
 
   // Estados do Formulário (Modal)
   let open = $state(false);
@@ -60,7 +63,7 @@
     }
   }
 
-  function handleQueryChange(params: { where: any; sort: any }) {
+  function handleQueryChange(params: { where: productFindManyWhereArgs; sort: productFindManySortArgs }) {
     currentQuery = params;
     loadProducts();
   }
@@ -139,6 +142,7 @@
         <Table.Cell>{product.description}</Table.Cell>
         <Table.Cell>{product.internal_code}</Table.Cell>
         <Table.Cell>{product.sku}</Table.Cell>
+        <Table.Cell>{product.total_in_stocks}</Table.Cell>
         <Table.Cell>{product.observations ?? "-"}</Table.Cell>
         <Table.Cell class="text-right">
           <div class="flex justify-end gap-2">
