@@ -59,6 +59,6 @@ export type DataTableProps<
     columns: Column<WhereField, SortField>[];
     data: any[];
     loading: boolean;
-    onQueryChange: (params: { where: W; sort: S }) => void;
+    onQueryChange: (params: { page: number; limit: number; where: W; sort: S }) => void;
     children: Snippet;
 };

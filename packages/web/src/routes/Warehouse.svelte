@@ -18,6 +18,9 @@
   import type { WarehouseFindManySortArgs, WarehouseFindManyWhereArgs } from "$lib/types/findManyArgs";
 
   // Estados da Lista
+  let totalRecords = $state(0);
+  let currentPage = $state(1);
+  let pageLimit = $state(10);
   let warehouses = $state<Warehouse[]>([]);
   let loading = $state(true);
 
@@ -49,13 +52,14 @@
   async function loadWarehouses() {
     loading = true;
     try {
-      const { data } = await warehouseRequests.findMany({
-        page: 1,
-        limit: 100,
+      const { data, meta } = await warehouseRequests.findMany({
+        page: currentPage,
+        limit: pageLimit,
         where: currentQuery.where,
         sort: currentQuery.sort,
       });
       warehouses = data;
+      totalRecords = meta.total_registers ?? 0;
     } catch (error) {
       if (error instanceof Error) toast.error(error.message);
       else toast.error("Erro ao carregar estoques");
@@ -64,8 +68,10 @@
     }
   }
 
-  function handleQueryChange(params: { where: WarehouseFindManyWhereArgs; sort: WarehouseFindManySortArgs }) {
-    currentQuery = params;
+  function handleQueryChange(params: { page: number; limit: number; where: WarehouseFindManyWhereArgs; sort: WarehouseFindManySortArgs }) {
+    currentPage = params.page;
+    pageLimit = params.limit;
+    currentQuery = { where: params.where, sort: params.sort };
     loadWarehouses();
   }
 
@@ -135,7 +141,7 @@
     </Button>
   </div>
 
-  <DataTable {columns} data={warehouses} {loading} onQueryChange={handleQueryChange}>
+  <DataTable {columns} data={warehouses} {loading} onQueryChange={handleQueryChange} page={currentPage} limit={pageLimit} total={totalRecords}>
     {#each warehouses as warehouse}
       <Table.Row>
         <Table.Cell>{warehouse.description}</Table.Cell>

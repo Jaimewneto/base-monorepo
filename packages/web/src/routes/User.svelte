@@ -16,6 +16,9 @@
   import type { Column, WhereField, SortField } from "$lib/types/components/DataTable";
   import type { UserFindManyWhereArgs, UserFindManySortArgs } from "$lib/types/findManyArgs";
 
+  let totalRecords = $state(0);
+  let currentPage = $state(1);
+  let pageLimit = $state(10);
   let users = $state<User[]>([]);
   let loading = $state(true);
 
@@ -46,13 +49,14 @@
   async function loadUsers() {
     loading = true;
     try {
-      const { data } = await userRequests.findMany({
-        page: 1,
-        limit: 100,
+      const { data, meta } = await userRequests.findMany({
+        page: currentPage,
+        limit: pageLimit,
         where: currentQuery.where,
         sort: currentQuery.sort,
       });
       users = data;
+      totalRecords = meta.total_registers ?? 0;
     } catch (err) {
       toast.error("Erro ao carregar usuários");
     } finally {
@@ -60,8 +64,10 @@
     }
   }
 
-  function handleQueryChange(params: { where: UserFindManyWhereArgs; sort: UserFindManySortArgs }) {
-    currentQuery = params;
+  function handleQueryChange(params: { page: number; limit: number; where: UserFindManyWhereArgs; sort: UserFindManySortArgs }) {
+    currentPage = params.page;
+    pageLimit = params.limit;
+    currentQuery = { where: params.where, sort: params.sort };
     loadUsers();
   }
 
@@ -120,7 +126,7 @@
     </Button>
   </div>
 
-  <DataTable {columns} data={users} {loading} onQueryChange={handleQueryChange}>
+  <DataTable {columns} data={users} {loading} onQueryChange={handleQueryChange} page={currentPage} limit={pageLimit} total={totalRecords}>
     {#each users as user}
       <Table.Row>
         <Table.Cell>{user.name}</Table.Cell>

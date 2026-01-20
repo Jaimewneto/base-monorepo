@@ -18,6 +18,9 @@
   import type { Column, SortField, WhereField } from "$lib/types/components/DataTable";
 
   // Estados da Lista
+  let totalRecords = $state(0);
+  let currentPage = $state(1);
+  let pageLimit = $state(10);
   let products = $state<ProductWithStocks[]>([]);
   let loading = $state(true);
 
@@ -61,13 +64,14 @@
   async function loadProducts() {
     loading = true;
     try {
-      const { data } = await productRequests.findMany({
-        page: 1,
-        limit: 100,
+      const { data, meta } = await productRequests.findMany({
+        page: currentPage,
+        limit: pageLimit,
         where: currentQuery.where,
         sort: currentQuery.sort,
       });
       products = data;
+      totalRecords = meta.total_registers ?? 0;
     } catch (error) {
       if (error instanceof Error) toast.error(error.message);
       else toast.error("Erro ao carregar produtos");
@@ -76,8 +80,10 @@
     }
   }
 
-  function handleQueryChange(params: { where: ProductFindManyWhereArgs; sort: ProductFindManySortArgs }) {
-    currentQuery = params;
+  function handleQueryChange(params: { page: number; limit: number; where: ProductFindManyWhereArgs; sort: ProductFindManySortArgs }) {
+    currentPage = params.page;
+    pageLimit = params.limit;
+    currentQuery = { where: params.where, sort: params.sort };
     loadProducts();
   }
 
@@ -149,7 +155,7 @@
     </Button>
   </div>
 
-  <DataTable {columns} data={products} {loading} onQueryChange={handleQueryChange}>
+  <DataTable {columns} data={products} {loading} onQueryChange={handleQueryChange} page={currentPage} limit={pageLimit} total={totalRecords}>
     {#each products as product}
       <Table.Row>
         <Table.Cell>{product.description}</Table.Cell>
