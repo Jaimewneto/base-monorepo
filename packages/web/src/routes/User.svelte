@@ -1,35 +1,79 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { toast } from "svelte-sonner";
+  import { Loader2, UserPlus, Pencil, Save, Trash2 } from "@lucide/svelte";
+
   import { Button } from "$lib/components/ui/button";
   import * as Table from "$lib/components/ui/table";
   import * as Sheet from "$lib/components/ui/sheet";
   import { Input } from "$lib/components/ui/input";
   import { Label } from "$lib/components/ui/label";
-  import { userRequests } from "$lib/services/api-requests/user";
-  import { Loader2, UserPlus, Pencil, Save } from "@lucide/svelte";
-  import type { User } from "$lib/types/api-returns/user";
+  import DataTable from "$lib/components/DataTable.svelte";
 
-  // Estados da Lista
+  import { userRequests } from "$lib/services/api-requests/user";
+
+  import type { User } from "$lib/types/api-returns/user";
+  import type { Column, WhereField, SortField } from "$lib/types/components/DataTable";
+  import type { UserFindManyWhereArgs, UserFindManySortArgs } from "$lib/types/findManyArgs";
+
   let users = $state<User[]>([]);
   let loading = $state(true);
 
-  // Estados do Formulário (Modal)
-  let open = $state(false);
-  let saving = $state(false);
-  let userToEdit = $state<User | null>(null); // Se null, é criação. Se tem objeto, é edição.
+  const columns = [
+    {
+      label: "Nome",
+      field: "user.name",
+      operator: "ilike",
+      valueType: "string",
+      sortable: true,
+      filterable: true,
+    },
+    {
+      label: "Email",
+      field: "user.email",
+      operator: "ilike",
+      valueType: "string",
+      sortable: true,
+      filterable: true,
+    },
+  ] satisfies Column<WhereField<NonNullable<UserFindManyWhereArgs>>, SortField<UserFindManySortArgs>>[];
 
-  // Campos do Form
-  let formData = $state({ name: "", email: "", password: "" });
+  let currentQuery = $state({
+    where: { conditions: [] } as UserFindManyWhereArgs,
+    sort: [{ field: "user.name", direction: "asc" }] as UserFindManySortArgs,
+  });
 
   async function loadUsers() {
     loading = true;
     try {
-      const { data } = await userRequests.findMany({ page: 1, limit: 100 });
+      const { data } = await userRequests.findMany({
+        page: 1,
+        limit: 100,
+        where: currentQuery.where,
+        sort: currentQuery.sort,
+      });
       users = data;
+    } catch (err) {
+      toast.error("Erro ao carregar usuários");
     } finally {
       loading = false;
     }
   }
+
+  function handleQueryChange(params: { where: UserFindManyWhereArgs; sort: UserFindManySortArgs }) {
+    currentQuery = params;
+    loadUsers();
+  }
+
+  let open = $state(false);
+  let saving = $state(false);
+  let userToEdit = $state<User | null>(null);
+
+  let formData = $state({
+    name: "",
+    email: "",
+    password: "",
+  });
 
   function openCreate() {
     userToEdit = null;
@@ -39,7 +83,7 @@
 
   function openEdit(user: User) {
     userToEdit = user;
-    formData = { name: user.name, email: user.email, password: "" }; // Senha vazia na edição
+    formData = { name: user.name, email: user.email, password: "" };
     open = true;
   }
 
@@ -48,16 +92,18 @@
     saving = true;
     try {
       if (userToEdit) {
-        // Modo Edição
-        await userRequests.updateOneById({ id: userToEdit.id, name: formData.name });
+        await userRequests.updateOneById({
+          id: userToEdit.id,
+          name: formData.name,
+        });
       } else {
-        // Modo Criação
         await userRequests.create(formData);
       }
       open = false;
-      await loadUsers(); // Recarrega a lista
+      await loadUsers();
+      toast.success("Usuário salvo com sucesso");
     } catch (err) {
-      alert("Erro ao salvar usuário");
+      toast.error("Erro ao salvar usuário");
     } finally {
       saving = false;
     }
@@ -74,32 +120,24 @@
     </Button>
   </div>
 
-  <div class="rounded-md border bg-card">
-    <Table.Root>
-      <Table.Header>
-        <Table.Row>
-          <Table.Head>Nome</Table.Head>
-          <Table.Head>Email</Table.Head>
-          <Table.Head class="text-right">Ações</Table.Head>
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>
-        {#each users as user}
-          <Table.Row>
-            <Table.Cell>{user.name}</Table.Cell>
-            <Table.Cell>{user.email}</Table.Cell>
-            <Table.Cell class="text-right">
-              <Button variant="ghost" size="icon" onclick={() => openEdit(user)}>
-                <Pencil class="h-4 w-4" />
-              </Button>
-            </Table.Cell>
-          </Table.Row>
-        {/each}
-      </Table.Body>
-    </Table.Root>
-  </div>
+  <DataTable {columns} data={users} {loading} onQueryChange={handleQueryChange}>
+    {#each users as user}
+      <Table.Row>
+        <Table.Cell>{user.name}</Table.Cell>
+        <Table.Cell>{user.email}</Table.Cell>
+        <Table.Cell class="text-right">
+          <div class="flex justify-end gap-2">
+            <Button variant="ghost" size="icon" onclick={() => openEdit(user)}>
+              <Pencil class="h-4 w-4" />
+            </Button>
+          </div>
+        </Table.Cell>
+      </Table.Row>
+    {/each}
+  </DataTable>
 </div>
 
+<!-- Sheet -->
 <Sheet.Root bind:open>
   <Sheet.Content side="right" class="w-[400px] sm:w-[540px]">
     <Sheet.Header>
@@ -111,24 +149,24 @@
 
     <form onsubmit={handleSubmit} class="grid gap-4 py-6">
       <div class="grid gap-2">
-        <Label for="name">Nome Completo</Label>
-        <Input id="name" bind:value={formData.name} placeholder="Ex: João Silva" required />
+        <Label for="name">Nome</Label>
+        <Input id="name" bind:value={formData.name} required />
       </div>
 
       <div class="grid gap-2">
-        <Label for="email">E-mail</Label>
-        <Input id="email" type="email" bind:value={formData.email} disabled={!!userToEdit} placeholder="joao@empresa.com" required />
+        <Label for="email">Email</Label>
+        <Input id="email" type="email" bind:value={formData.email} disabled={!!userToEdit} required />
       </div>
 
       {#if !userToEdit}
         <div class="grid gap-2">
-          <Label for="password">Senha Inicial</Label>
+          <Label for="password">Senha inicial</Label>
           <Input id="password" type="password" bind:value={formData.password} required />
         </div>
       {/if}
 
       <div class="flex justify-end gap-3 mt-4">
-        <Button variant="outline" onclick={() => (open = false)} type="button">Cancelar</Button>
+        <Button variant="outline" type="button" onclick={() => (open = false)}>Cancelar</Button>
         <Button type="submit" disabled={saving}>
           {#if saving}
             <Loader2 class="mr-2 h-4 w-4 animate-spin" />

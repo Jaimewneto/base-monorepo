@@ -1,3 +1,4 @@
+import type { UserFindManySortArgs, UserFindManyWhereArgs } from "$lib/types/findManyArgs";
 import { getAuthenticatedApi } from "../api.client";
 
 export const userRequests = {
@@ -16,13 +17,25 @@ export const userRequests = {
 
         return res.data;
     },
-    findMany: async ({ page, limit }: { page: number; limit: number }) => {
+    findMany: async ({
+            page,
+            limit,
+            where = { conditions: [] },
+            sort,
+        }: {
+            page: number;
+            limit: number;
+            where: UserFindManyWhereArgs;
+            sort: UserFindManySortArgs;
+        }) => {
         const authApi = getAuthenticatedApi();
 
         const req = await authApi.private.user.list.$post({
             json: {
                 page,
                 limit,
+                where,
+                sort,
             },
         });
 
