@@ -1,10 +1,11 @@
-import type { UserFindManySortArgs, UserFindManyWhereArgs } from "$lib/types/findManyArgs";
-import { getAuthenticatedApi } from "../api.client";
+import type {
+    UserFindManySortArgs,
+    UserFindManyWhereArgs,
+} from "$lib/types/findManyArgs";
+import { authApi } from "../api.client";
 
 export const userRequests = {
     findOneById: async (id: string) => {
-        const authApi = getAuthenticatedApi();
-
         const req = await authApi.private.user[":id"].$get({
             param: { id },
         });
@@ -18,18 +19,16 @@ export const userRequests = {
         return res.data;
     },
     findMany: async ({
-            page,
-            limit,
-            where = { conditions: [] },
-            sort,
-        }: {
-            page: number;
-            limit: number;
-            where: UserFindManyWhereArgs;
-            sort: UserFindManySortArgs;
-        }) => {
-        const authApi = getAuthenticatedApi();
-
+        page,
+        limit,
+        where = { conditions: [] },
+        sort,
+    }: {
+        page: number;
+        limit: number;
+        where: UserFindManyWhereArgs;
+        sort: UserFindManySortArgs;
+    }) => {
         const req = await authApi.private.user.list.$post({
             json: {
                 page,
@@ -56,8 +55,6 @@ export const userRequests = {
         email: string;
         password: string;
     }) => {
-        const authApi = getAuthenticatedApi();
-
         const req = await authApi.private.user.$post({
             json: {
                 name,
@@ -75,8 +72,6 @@ export const userRequests = {
         return res.data;
     },
     updateOneById: async ({ id, name }: { id: string; name: string }) => {
-        const authApi = getAuthenticatedApi();
-
         const req = await authApi.private.user[":id"].$patch({
             param: { id },
             json: {

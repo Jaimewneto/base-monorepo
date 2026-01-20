@@ -1,4 +1,4 @@
-import { api, getAuthenticatedApi } from "../api.client";
+import { api, authApi } from "../api.client";
 
 export const authRequests = {
     login: async ({ email, password }: { email: string; password: string }) => {
@@ -15,8 +15,6 @@ export const authRequests = {
         return res.data;
     },
     me: async (accessToken: string) => {
-        const authApi = getAuthenticatedApi();
-
         const req = await authApi.public.auth.me.$post({
             json: {
                 accessToken,
@@ -43,5 +41,5 @@ export const authRequests = {
         if (!res.success) throw new Error("Request failed");
 
         return res.data;
-    }
+    },
 };

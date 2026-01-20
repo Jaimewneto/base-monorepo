@@ -5,7 +5,7 @@
     import { Input } from "$lib/components/ui/input";
     import { Label } from "$lib/components/ui/label";
 
-    import { authStore } from "$lib/stores/auth";
+    import { authStore } from "$lib/auth/auth.store";
     import { authRequests } from "$lib/services/api-requests/auth";
 
     let email = $state("");
@@ -26,7 +26,7 @@
 
             const { user, credentials } = await authRequests.login({ email, password });
 
-            authStore.setAuth({ user, credentials });
+            authStore.setCredentials({ credentials, user });
 
             router.goto("/");
         } catch (err) {

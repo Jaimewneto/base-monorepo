@@ -2,7 +2,7 @@
   import { LogOut, Moon, Sun, Package, Users, Warehouse, Menu } from "@lucide/svelte";
   import { router, active } from "tinro";
   import { Button } from "$lib/components/ui/button";
-  import { authStore } from "$lib/stores/auth";
+  import { authStore } from "$lib/auth/auth.store";
   import * as NavigationMenu from "$lib/components/ui/navigation-menu";
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
 
@@ -14,7 +14,7 @@
   let { toggleTheme, isDark }: Props = $props();
 
   const handleLogout = () => {
-    authStore.clear();
+    authStore.logout();
     router.goto("/login");
   };
 

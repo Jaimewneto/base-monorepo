@@ -12,13 +12,17 @@
     },
     "scripts": {
         "build": "pnpm --filter @base-monorepo/api build && tsup src/index.ts --format esm --dts --clean",
-        "dev": "tsup src/index.ts --format esm --dts --watch"
+        "dev": "tsup src/index.ts --format esm --dts --watch",
+        "lint": "pnpm biome lint .",
+        "format": "pnpm biome format --write .",
+        "check": "pnpm biome check --write --max-diagnostics=1000 ."
     },
     "dependencies": {
         "@base-monorepo/api": "workspace:*",
         "hono": "^4.11.3"
     },
     "devDependencies": {
+        "@biomejs/biome": "2.3.11",
         "@types/node": "^25.0.9",
         "tsup": "^8.5.1",
         "typescript": "^5.8.3"

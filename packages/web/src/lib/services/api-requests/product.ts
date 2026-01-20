@@ -3,12 +3,10 @@ import type {
     ProductFindManyWhereArgs,
 } from "$lib/types/findManyArgs";
 
-import { getAuthenticatedApi } from "../api.client";
+import { authApi } from "../api.client";
 
 export const productRequests = {
     findOneById: async (id: string) => {
-        const authApi = getAuthenticatedApi();
-
         const req = await authApi.private.product[":id"].$get({
             param: { id },
         });
@@ -32,8 +30,6 @@ export const productRequests = {
         where: ProductFindManyWhereArgs;
         sort: ProductFindManySortArgs;
     }) => {
-        const authApi = getAuthenticatedApi();
-
         const req = await authApi.private.product.list.$post({
             json: {
                 page,
@@ -62,8 +58,6 @@ export const productRequests = {
         sku: string;
         observations?: string | null;
     }) => {
-        const authApi = getAuthenticatedApi();
-
         const req = await authApi.private.product.$post({
             json: {
                 description,
@@ -94,8 +88,6 @@ export const productRequests = {
         sku: string;
         observations?: string | null;
     }) => {
-        const authApi = getAuthenticatedApi();
-
         const req = await authApi.private.product[":id"].$patch({
             param: { id },
             json: {
@@ -115,8 +107,6 @@ export const productRequests = {
         return res.data;
     },
     deleteOneById: async (id: string) => {
-        const authApi = getAuthenticatedApi();
-
         const req = await authApi.private.product[":id"].$delete({
             param: { id },
         });

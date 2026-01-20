@@ -1,10 +1,11 @@
-import type { WarehouseFindManySortArgs, WarehouseFindManyWhereArgs } from "$lib/types/findManyArgs";
-import { getAuthenticatedApi } from "../api.client";
+import type {
+    WarehouseFindManySortArgs,
+    WarehouseFindManyWhereArgs,
+} from "$lib/types/findManyArgs";
+import { authApi } from "../api.client";
 
 export const warehouseRequests = {
     findOneById: async (id: string) => {
-        const authApi = getAuthenticatedApi();
-
         const req = await authApi.private.warehouse[":id"].$get({
             param: { id },
         });
@@ -28,8 +29,6 @@ export const warehouseRequests = {
         where: WarehouseFindManyWhereArgs;
         sort: WarehouseFindManySortArgs;
     }) => {
-        const authApi = getAuthenticatedApi();
-
         const req = await authApi.private.warehouse.list.$post({
             json: {
                 page,
@@ -54,8 +53,6 @@ export const warehouseRequests = {
         description: string;
         observations?: string | null;
     }) => {
-        const authApi = getAuthenticatedApi();
-
         const req = await authApi.private.warehouse.$post({
             json: {
                 description,
@@ -80,8 +77,6 @@ export const warehouseRequests = {
         description: string;
         observations?: string | null;
     }) => {
-        const authApi = getAuthenticatedApi();
-
         const req = await authApi.private.warehouse[":id"].$patch({
             param: { id },
             json: {
@@ -99,8 +94,6 @@ export const warehouseRequests = {
         return res.data;
     },
     deleteOneById: async (id: string) => {
-        const authApi = getAuthenticatedApi();
-
         const req = await authApi.private.warehouse[":id"].$delete({
             param: { id },
         });

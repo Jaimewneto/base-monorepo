@@ -42,7 +42,7 @@ export const login = async ({
     })
         .setProtectedHeader({ alg: "HS256" })
         .setIssuedAt()
-        .setExpirationTime("1m")
+        .setExpirationTime("2h")
         .sign(new TextEncoder().encode(env.JWT_SECRET));
 
     const refreshToken = await new jose.SignJWT({
