@@ -70,7 +70,7 @@
   <div class="flex items-center justify-between">
     <h2 class="text-3xl font-bold tracking-tight">Usuários</h2>
     <Button size="sm" onclick={openCreate}>
-      <UserPlus class="mr-2 h-4 w-4" /> Novo Usuário
+      <UserPlus class="mr-2 h-4 w-4" /> Novo usuário
     </Button>
   </div>
 
@@ -103,7 +103,7 @@
 <Sheet.Root bind:open>
   <Sheet.Content side="right" class="w-[400px] sm:w-[540px]">
     <Sheet.Header>
-      <Sheet.Title>{userToEdit ? "Editar Usuário" : "Novo Usuário"}</Sheet.Title>
+      <Sheet.Title>{userToEdit ? "Editar usuário" : "Novo usuário"}</Sheet.Title>
       <Sheet.Description>
         {userToEdit ? "Altere as informações do usuário selecionado." : "Preencha os dados para cadastrar um novo usuário."}
       </Sheet.Description>

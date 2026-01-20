@@ -1,61 +1,11 @@
 <script lang="ts">
-  import { type Snippet } from "svelte";
   import * as Table from "$lib/components/ui/table";
   import { Input } from "$lib/components/ui/input";
   import { Button } from "$lib/components/ui/button";
   import { ArrowUpDown, Loader2 } from "@lucide/svelte";
+  import type { DataTableProps } from "$lib/types/components/DataTable";
 
-  /**
-   * Extrai os campos possíveis do where.conditions
-   */
-  export type WhereField<T> = T extends { conditions: (infer C)[] }
-    ? C extends { field: infer F }
-      ? F
-      : C extends { conditions: { field: infer F }[] }
-        ? F
-        : never
-    : never;
-
-  /**
-   * Coluna tipada pelo campo válido do WHERE
-   */
-  type BaseColumn = {
-    label: string;
-    operator: "ilike" | "=" | ">" | "<" | ">=" | "<=";
-    valueType: "string" | "number" | "date";
-  };
-
-  type ActiveColumn<Field extends string> = BaseColumn & {
-    field: Field;
-    sortable?: true;
-    filterable?: true;
-  };
-
-  type PassiveColumn = BaseColumn & {
-    field?: string;
-    sortable: false;
-    filterable: false;
-  };
-
-  export type Column<Field extends string> = ActiveColumn<Field> | PassiveColumn;
-
-  /**
-   * Props genéricas da DataTable
-   */
-  type DataTableProps<Field extends string, W, S> = {
-    columns: Column<Field>[];
-    data: any[];
-    loading: boolean;
-    onQueryChange: (params: { where: W; sort: S }) => void;
-    children: Snippet;
-  };
-
-  /**
-   * ⚠️ IMPORTANTE:
-   * Aqui o componente continua genérico.
-   * Quem usa ele é que injeta W e S concretos
-   */
-  let { columns, data, loading, onQueryChange, children }: DataTableProps<string, any, any> = $props();
+  let { columns, data, loading, onQueryChange, children }: DataTableProps<string, string, any, any> = $props();
 
   let filters = $state<Record<string, string>>({});
   let sortField = $state<string | null>(null);

@@ -1,3 +1,4 @@
+import type { WarehouseFindManySortArgs, WarehouseFindManyWhereArgs } from "$lib/types/findManyArgs";
 import { getAuthenticatedApi } from "../api.client";
 
 export const warehouseRequests = {
@@ -24,8 +25,8 @@ export const warehouseRequests = {
     }: {
         page: number;
         limit: number;
-        where: any;
-        sort: any[];
+        where: WarehouseFindManyWhereArgs;
+        sort: WarehouseFindManySortArgs;
     }) => {
         const authApi = getAuthenticatedApi();
 

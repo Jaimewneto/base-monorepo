@@ -1,4 +1,7 @@
-import type { productFindManySortArgs, productFindManyWhereArgs } from "$lib/types/findManyArgs";
+import type {
+    ProductFindManySortArgs,
+    ProductFindManyWhereArgs,
+} from "$lib/types/findManyArgs";
 
 import { getAuthenticatedApi } from "../api.client";
 
@@ -26,8 +29,8 @@ export const productRequests = {
     }: {
         page: number;
         limit: number;
-        where: productFindManyWhereArgs;
-        sort: productFindManySortArgs;
+        where: ProductFindManyWhereArgs;
+        sort: ProductFindManySortArgs;
     }) => {
         const authApi = getAuthenticatedApi();
 

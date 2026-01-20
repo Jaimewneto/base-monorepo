@@ -1,31 +1,37 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { toast } from "svelte-sonner";
+  import { Loader2, Pencil, Save, Trash2, WarehouseIcon } from "@lucide/svelte";
+
   import { Button } from "$lib/components/ui/button";
   import * as Table from "$lib/components/ui/table";
   import * as Sheet from "$lib/components/ui/sheet";
   import { Input } from "$lib/components/ui/input";
   import { Label } from "$lib/components/ui/label";
-  import { toast } from "svelte-sonner";
   import * as AlertDialog from "$lib/components/ui/alert-dialog";
-  import { warehouseRequests } from "$lib/services/api-requests/warehouse";
-  import { Loader2, Pencil, Save, Trash2, WarehouseIcon } from "@lucide/svelte";
-  import type { Warehouse } from "$lib/types/api-returns/warehouse";
+  import DataTable from "$lib/components/DataTable.svelte";
 
-  // Importando o seu componente DataTable
-  import DataTable, { type Column } from "$lib/components/DataTable.svelte";
+  import { warehouseRequests } from "$lib/services/api-requests/warehouse";
+
+  import type { Warehouse } from "$lib/types/api-returns/warehouse";
+  import type { Column, SortField, WhereField } from "$lib/types/components/DataTable";
+  import type { WarehouseFindManySortArgs, WarehouseFindManyWhereArgs } from "$lib/types/findManyArgs";
 
   // Estados da Lista
   let warehouses = $state<Warehouse[]>([]);
   let loading = $state(true);
 
   // Definição das colunas para o seu DataTable
-  const columns: Column[] = [
+  const columns = [
     { label: "Descrição", field: "warehouse.description", operator: "ilike", valueType: "string", sortable: true, filterable: true },
     { label: "Observações", field: "warehouse.observations", operator: "ilike", valueType: "string", sortable: true, filterable: true },
-  ];
+  ] satisfies Column<WhereField<NonNullable<WarehouseFindManyWhereArgs>>, SortField<WarehouseFindManySortArgs>>[];
 
   // Estado para armazenar a query atual
-  let currentQuery = $state({ where: { conditions: [] } as any, sort: [] as any[] });
+  let currentQuery = $state({
+    where: { conditions: [] } as WarehouseFindManyWhereArgs,
+    sort: [{ field: "warehouse.description", direction: "asc" }] as WarehouseFindManySortArgs,
+  });
 
   // Estados do Formulário (Modal)
   let open = $state(false);
@@ -58,7 +64,7 @@
     }
   }
 
-  function handleQueryChange(params: { where: any; sort: any }) {
+  function handleQueryChange(params: { where: WarehouseFindManyWhereArgs; sort: WarehouseFindManySortArgs }) {
     currentQuery = params;
     loadWarehouses();
   }

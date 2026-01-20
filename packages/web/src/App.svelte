@@ -4,8 +4,6 @@
   import Navbar from "$lib/components/layout/Navbar.svelte";
   import { Toaster } from "$lib/components/ui/sonner";
   import { authStore } from "$lib/stores/auth";
-
-  import Home from "./routes/Home.svelte";
   import Login from "./routes/Login.svelte";
   import Product from "./routes/Product.svelte";
   import User from "./routes/User.svelte";
@@ -45,7 +43,6 @@
     <div class="flex flex-col min-h-screen">
       <Navbar {toggleTheme} {isDark} />
       <main class="container mx-auto p-6 flex-1">
-        <Route path="/"><Home /></Route>
         <Route path="/users"><User /></Route>
         <Route path="/products"><Product /></Route>
         <Route path="/warehouses"><Warehouse /></Route>

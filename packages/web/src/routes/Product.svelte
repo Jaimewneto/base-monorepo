@@ -1,20 +1,21 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { toast } from "svelte-sonner";
+  import { Loader2, Pencil, Save, Trash2, PackagePlus } from "@lucide/svelte";
+
   import { Button } from "$lib/components/ui/button";
   import * as Table from "$lib/components/ui/table";
   import * as Sheet from "$lib/components/ui/sheet";
   import { Input } from "$lib/components/ui/input";
   import { Label } from "$lib/components/ui/label";
-  import { toast } from "svelte-sonner";
+  import DataTable from "$lib/components/DataTable.svelte";
   import * as AlertDialog from "$lib/components/ui/alert-dialog";
+
   import { productRequests } from "$lib/services/api-requests/product";
-  import { Loader2, Pencil, Save, Trash2, PackagePlus } from "@lucide/svelte";
+
   import type { Product, ProductWithStocks } from "$lib/types/api-returns/product";
-
-  // Importando o seu componente DataTable
-  import DataTable, { type Column, type WhereField } from "$lib/components/DataTable.svelte";
-
-  import type { productFindManySortArgs, productFindManyWhereArgs } from "$lib/types/findManyArgs";
+  import type { ProductFindManySortArgs, ProductFindManyWhereArgs } from "$lib/types/findManyArgs";
+  import type { Column, SortField, WhereField } from "$lib/types/components/DataTable";
 
   // Estados da Lista
   let products = $state<ProductWithStocks[]>([]);
@@ -27,10 +28,13 @@
     { label: "SKU", field: "product.sku", operator: "ilike", valueType: "string", sortable: true, filterable: true },
     { label: "Total em estoque", field: "product.total_in_stocks", operator: "=", valueType: "number", sortable: false, filterable: false },
     { label: "Observações", field: "product.observations", operator: "ilike", valueType: "string", sortable: true, filterable: true },
-  ] satisfies Column<WhereField<NonNullable<productFindManyWhereArgs>>>[];
+  ] satisfies Column<WhereField<NonNullable<ProductFindManyWhereArgs>>, SortField<ProductFindManySortArgs>>[];
 
   // Estado para armazenar a query atual
-  let currentQuery = $state({ where: { conditions: [] } as productFindManyWhereArgs, sort: [] as productFindManySortArgs });
+  let currentQuery = $state({
+    where: { conditions: [] } as ProductFindManyWhereArgs,
+    sort: [{ field: "product.description", direction: "asc" }] as ProductFindManySortArgs,
+  });
 
   // Estados do Formulário (Modal)
   let open = $state(false);
@@ -63,7 +67,7 @@
     }
   }
 
-  function handleQueryChange(params: { where: productFindManyWhereArgs; sort: productFindManySortArgs }) {
+  function handleQueryChange(params: { where: ProductFindManyWhereArgs; sort: ProductFindManySortArgs }) {
     currentQuery = params;
     loadProducts();
   }
