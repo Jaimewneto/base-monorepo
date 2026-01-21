@@ -7,35 +7,23 @@ export async function up(db: Kysely<Database>): Promise<void> {
     await sql`create extension if not exists pgcrypto`.execute(db);
     // uuidv7 fallback for PG < 18
     await sql`
-        do $$
-        begin
-            if not exists (
-                select 1
-                from pg_proc
-                where proname = 'uuidv7'
-            ) then
-                create function uuidv7()
-                returns uuid
-                language sql
-                volatile
-                as $fn$
-                    with ts as (
-                        select (extract(epoch from clock_timestamp()) * 1000)::bigint as ms
-                    )
-                    select (
-                        lpad(to_hex((ms >> 16) & 65535), 4, '0') ||
-                        lpad(to_hex(ms & 65535), 4, '0') ||
-                        lpad(to_hex((random() * 65535)::int), 4, '0') ||
-                        lpad(to_hex((random() * 4095)::int | 28672), 4, '0') ||
-                        lpad(to_hex((random() * 16383)::int | 32768), 4, '0') ||
-                        lpad(to_hex((random() * 65535)::int), 4, '0') ||
-                        lpad(to_hex((random() * 65535)::int), 4, '0')
-                    )::uuid
-                    from ts;
-                $fn$;
-            end if;
-        end
-        $$;
+        CREATE OR REPLACE FUNCTION uuidv7()
+        RETURNS uuid
+        AS $$
+        DECLARE
+            unix_ts_ms bytea;
+            uuid_bytes bytea;
+        BEGIN
+            unix_ts_ms = substring(int8send(floor(extract(epoch from clock_timestamp()) * 1000)::bigint) from 3);
+            
+            uuid_bytes = unix_ts_ms || gen_random_bytes(10);
+            
+            uuid_bytes = set_byte(uuid_bytes, 6, (get_byte(uuid_bytes, 6) & 15) | 112);
+            uuid_bytes = set_byte(uuid_bytes, 8, (get_byte(uuid_bytes, 8) & 63) | 128);
+            
+            RETURN encode(uuid_bytes, 'hex')::uuid;
+        END
+        $$ LANGUAGE plpgsql VOLATILE;
     `.execute(db);
 }
 
