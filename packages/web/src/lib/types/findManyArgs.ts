@@ -1,6 +1,4 @@
-import { getAuthenticatedApi } from "$lib/services/api.client";
-
-const authApi = getAuthenticatedApi();
+import type { authApi } from "$lib/services/api.client";
 
 export type ProductFindManyWhereArgs = Parameters<
     typeof authApi.private.product.list.$post

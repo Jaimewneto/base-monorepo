@@ -1,7 +1,7 @@
 // api.fetch.ts
 import { get } from "svelte/store";
-import { authStore } from "$lib/auth/auth.store";
 import { authManager } from "$lib/auth/auth.manager";
+import { authStore } from "$lib/auth/auth.store";
 
 export async function apiFetch(input: RequestInfo | URL, init?: RequestInit) {
     const doFetch = () => {

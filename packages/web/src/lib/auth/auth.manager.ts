@@ -1,7 +1,7 @@
 // auth.manager.ts
 import { get } from "svelte/store";
-import { authStore } from "./auth.store";
 import { authRequests } from "$lib/services/api-requests/auth";
+import { authStore } from "./auth.store";
 
 let refreshPromise: Promise<void> | null = null;
 

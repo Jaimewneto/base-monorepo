@@ -1,12 +1,12 @@
 // packages/web/src/lib/services/api.client.ts
 import {
-    createClient,
     createAuthenticatedClient,
+    createClient,
 } from "@base-monorepo/api-client";
 
 import { get } from "svelte/store";
-import { apiFetch } from "./api.fetch";
 import { authStore } from "$lib/auth/auth.store";
+import { apiFetch } from "./api.fetch";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
