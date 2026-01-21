@@ -6,7 +6,8 @@ const envSchema = z.object({
     NODE_ENV: z
         .enum(["development", "production", "test"])
         .default("development"),
-
+    API_URL_DEV: z.url().default("http://localhost"),
+    API_URL_PROD: z.url().default("https://base-monorepo.onrender.com"),
     PORT: z.coerce.number().default(3000),
 
     JWT_SECRET: z.string().min(20),
@@ -20,6 +21,10 @@ const envSchema = z.object({
     DB_SSL: z
         .preprocess((val) => val === "true" || val === "1", z.boolean())
         .default(false),
+
+    FRONTEND_URL_DEV: z.url().default("http://localhost:5173"),
+    FRONTEND_URL_PREVIEW: z.url().default("http://localhost:4173"),
+    FRONTEND_URL_PROD: z.url().default("https://frontend-staging-f01.pages.dev"),
 });
 
 const _env = envSchema.safeParse(process.env);
