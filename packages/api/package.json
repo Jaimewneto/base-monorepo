@@ -13,7 +13,7 @@
     "scripts": {
         "dev": "tsup --watch --onSuccess \"node --env-file=.env dist/index.js\"",
         "build": "tsup src/index.ts --format esm --clean --minify",
-        "start": "node --env-file=.env dist/index.js",
+        "start": "node dist/index.js",
         "lint": "pnpm biome lint .",
         "format": "pnpm biome format --write .",
         "check": "pnpm biome check --write --max-diagnostics=1000 .",
@@ -38,5 +38,8 @@
         "tsup": "^8.5.1",
         "tsx": "^4.7.1",
         "typescript": "^5.8.3"
+    },
+    "engines": {
+        "node": ">=24"
     }
 }
