@@ -12,8 +12,8 @@ export default defineConfig({
             registerType: "autoUpdate",
             includeAssets: ["favicon.svg"],
             manifest: {
-                name: "Gestão de Estoque",
-                short_name: "Estoque",
+                name: "Gestão de estoque",
+                short_name: "Gestão de estoque",
                 description: "Sistema de gestão de estoque",
                 theme_color: "#020617",
                 background_color: "#020617",
