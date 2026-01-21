@@ -19,31 +19,19 @@ export async function up(db: Kysely<Database>): Promise<void> {
                 language sql
                 volatile
                 as $fn$
-                    select encode(
-                        set_byte(
-                            set_byte(
-                                set_byte(
-                                    set_byte(
-                                        set_byte(
-                                            gen_random_bytes(16),
-                                            6,
-                                            (get_byte(gen_random_bytes(1), 0) & 15) | 112
-                                        ),
-                                        8,
-                                        (get_byte(gen_random_bytes(1), 0) & 63) | 128
-                                    ),
-                                    0,
-                                    ((extract(epoch from clock_timestamp()) * 1000)::bigint >> 40)::int
-                                ),
-                                1,
-                                ((extract(epoch from clock_timestamp()) * 1000)::bigint >> 32)::int
-                            ),
-                            2,
-                            ((extract(epoch from clock_timestamp()) * 1000)::bigint >> 24)::int
-                        ),
-                        3,
-                        ((extract(epoch from clock_timestamp()) * 1000)::bigint >> 16)::int
-                    )::uuid;
+                    with ts as (
+                        select (extract(epoch from clock_timestamp()) * 1000)::bigint as ms
+                    )
+                    select (
+                        lpad(to_hex((ms >> 16) & 65535), 4, '0') ||
+                        lpad(to_hex(ms & 65535), 4, '0') ||
+                        lpad(to_hex((random() * 65535)::int), 4, '0') ||
+                        lpad(to_hex((random() * 4095)::int | 28672), 4, '0') ||
+                        lpad(to_hex((random() * 16383)::int | 32768), 4, '0') ||
+                        lpad(to_hex((random() * 65535)::int), 4, '0') ||
+                        lpad(to_hex((random() * 65535)::int), 4, '0')
+                    )::uuid
+                    from ts;
                 $fn$;
             end if;
         end
