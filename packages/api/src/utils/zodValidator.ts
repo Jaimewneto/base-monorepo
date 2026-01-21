@@ -26,6 +26,8 @@ export const zodValidate = <
                     success: false,
                     error: {
                         type: "validation_error",
+                        name: "ValidationError",
+                        message: result.error.message,
                         target,
                         fields: result.error.issues.map((issue) => ({
                             path: issue.path.join("."),

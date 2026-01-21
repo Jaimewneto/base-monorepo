@@ -33,7 +33,7 @@ export const productRepository = (db = client) => ({
     }: {
         page: number;
         limit: number;
-        where?: (eb: ExpressionBuilder<Database, "product">) => SqlBool;
+        where?: (eb: ExpressionBuilder<Database, TableName>) => SqlBool;
         orderBy?: {
             column: keyof Database[TableName] & string;
             direction: "asc" | "desc";

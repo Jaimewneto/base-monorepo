@@ -14,7 +14,8 @@ export const warehouseRequests = {
 
         const res = await req.json();
 
-        if (!res.success) throw new Error("Request failed");
+        if (!res.success)
+            throw new Error(res?.error?.message || "Request failed");
 
         return res.data;
     },
@@ -42,7 +43,8 @@ export const warehouseRequests = {
 
         const res = await req.json();
 
-        if (!res.success) throw new Error("Request failed");
+        if (!res.success)
+            throw new Error(res?.error?.message || "Request failed");
 
         return { meta: res.meta, data: res.data };
     },
@@ -64,7 +66,8 @@ export const warehouseRequests = {
 
         const res = await req.json();
 
-        if (!res.success) throw new Error("Request failed");
+        if (!res.success)
+            throw new Error(res?.error?.message || "Request failed");
 
         return res.data;
     },
@@ -89,7 +92,8 @@ export const warehouseRequests = {
 
         const res = await req.json();
 
-        if (!res.success) throw new Error("Request failed");
+        if (!res.success)
+            throw new Error(res?.error?.message || "Request failed");
 
         return res.data;
     },
@@ -102,7 +106,8 @@ export const warehouseRequests = {
 
         const res = await req.json();
 
-        if (!res.success) throw new Error("Request failed");
+        if (!res.success)
+            throw new Error(res?.error?.message || "Request failed");
 
         return res.data;
     },

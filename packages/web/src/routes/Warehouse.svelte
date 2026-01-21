@@ -119,14 +119,18 @@
     deleting = true;
     try {
       await warehouseRequests.deleteOneById(warehouseToDelete.id);
+
       deleteDialogOpen = false;
+
       await loadWarehouses();
-      toast.success("Estoque excluido com sucesso");
+
+      warehouseToDelete = null;
+      
+      toast.success("Estoque excluído com sucesso");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Erro ao excluir estoque");
     } finally {
       deleting = false;
-      warehouseToDelete = null;
     }
   }
 

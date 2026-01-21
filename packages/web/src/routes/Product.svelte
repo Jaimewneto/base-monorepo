@@ -133,14 +133,18 @@
     deleting = true;
     try {
       await productRequests.deleteOneById(productToDelete.id);
+
       deleteDialogOpen = false;
+
       await loadProducts();
+
+      productToDelete = null;
+
       toast.success("Produto excluido com sucesso");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Erro ao excluir produto");
     } finally {
       deleting = false;
-      productToDelete = null;
     }
   }
 
@@ -246,7 +250,7 @@
           <Table.Header>
             <Table.Row>
               <Table.Head>Estoque</Table.Head>
-              <Table.Head class="text-right">Qtd.</Table.Head>
+              <Table.Head class="text-right">Qtd</Table.Head>
             </Table.Row>
           </Table.Header>
           <Table.Body>
