@@ -161,14 +161,30 @@
     </Table.Body>
   </Table.Root>
 
-  <div class="flex items-center justify-between px-4 py-4 border-t bg-muted/20">
-    <div class="flex items-center gap-4">
+  <div
+    class="
+      flex flex-row items-center justify-between gap-4
+      px-3 py-3 border-t bg-muted/20
+    "
+  >
+    <div
+      class="
+        flex flex-col items-center gap-2 text-center
+        sm:flex-row sm:items-center sm:gap-4 sm:text-left
+      "
+    >
       <div class="text-xs text-muted-foreground font-medium">
-        Total de <span class="text-foreground">{total}</span> registros
+        <span class="text-foreground">{total}</span>
+        <span class="sm:inline"> registro(s)</span>
       </div>
 
-      <div class="flex items-center gap-2 border-l pl-4">
-        <span class="text-xs text-muted-foreground whitespace-nowrap">Linhas por página:</span>
+      <div
+        class="
+          flex items-center gap-2
+          sm:border-l sm:pl-4
+          opacity-80
+        "
+      >
         <DropdownMenu.Root>
           <DropdownMenu.Trigger>
             {#snippet child({ props })}
@@ -186,12 +202,19 @@
             {/each}
           </DropdownMenu.Content>
         </DropdownMenu.Root>
+        <span class="text-xs text-muted-foreground whitespace-nowrap">por pág.</span>
       </div>
     </div>
 
-    <div class="flex items-center gap-6">
+    <div
+      class="
+        flex flex-col items-center gap-3
+        sm:flex-row sm:gap-6
+      "
+    >
       <div class="flex items-center text-xs font-medium whitespace-nowrap">
-        Página {page} de {totalPages || 1}
+        <span class="sm:inline">Pág.</span>
+        {page} / {totalPages || 1}
       </div>
       <div class="flex items-center gap-2">
         <Button variant="outline" size="icon" class="h-8 w-8" disabled={page <= 1 || loading} onclick={() => changePage(-1)}>
