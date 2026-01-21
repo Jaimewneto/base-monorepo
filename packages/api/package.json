@@ -17,7 +17,8 @@
         "lint": "pnpm biome lint .",
         "format": "pnpm biome format --write .",
         "check": "pnpm biome check --write --max-diagnostics=1000 .",
-        "db:migrate": "tsx --env-file=.env src/database/scripts/migrate.ts"
+        "db:migrate-dev": "tsx --env-file=.env src/database/scripts/migrate.ts",
+        "db:migrate": "tsx src/database/scripts/migrate.ts"
     },
     "dependencies": {
         "@hono/node-server": "^1.19.8",
