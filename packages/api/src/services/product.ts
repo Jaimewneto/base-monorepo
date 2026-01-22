@@ -53,7 +53,7 @@ export const productService = {
             if (stocks.count > 0) {
                 throw new BadRequestError({
                     message:
-                        "Não é possível deletar um produto com itens com quantidade maior que zero",
+                        "Não é possível excluir um produto com itens com quantidade maior que zero",
                 });
             }
 

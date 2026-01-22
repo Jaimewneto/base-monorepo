@@ -15,8 +15,15 @@ export const stockRequestsValidations = () => {
         page: z.number().int().default(1),
     });
 
+    const createOrUpdate = z.object({
+        warehouse_id: z.uuid(),
+        product_id: z.uuid(),
+        amount: z.number().int().min(0),
+    });
+
     return {
         findOneById,
         findMany,
+        createOrUpdate,
     };
 };

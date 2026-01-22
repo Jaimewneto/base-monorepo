@@ -9,12 +9,18 @@ import { routes } from "./routes/index.js";
 import { processUtils } from "./utils/process.js";
 
 const server = new Hono()
-    .use("*", cors({
-        origin: env.NODE_ENV === "production" ? env.FRONTEND_URL_PROD : [env.FRONTEND_URL_DEV, env.FRONTEND_URL_PREVIEW],
-        allowHeaders: ["Authorization", "Content-Type"],
-        allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-        maxAge: 86400,
-    }))
+    .use(
+        "*",
+        cors({
+            origin:
+                env.NODE_ENV === "production"
+                    ? env.FRONTEND_URL_PROD
+                    : [env.FRONTEND_URL_DEV, env.FRONTEND_URL_PREVIEW],
+            allowHeaders: ["Authorization", "Content-Type"],
+            allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+            maxAge: 86400,
+        }),
+    )
     .onError((err, c) => {
         if (err instanceof BadRequestError) {
             return c.json(

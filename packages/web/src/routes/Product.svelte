@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { toast } from "svelte-sonner";
-  import { Loader2, Pencil, Save, Trash2, PackagePlus, Warehouse } from "@lucide/svelte";
+  import { Loader2, Pencil, Save, Trash2, PackagePlus, Warehouse, X } from "@lucide/svelte";
 
   import { Button } from "$lib/components/ui/button";
   import * as Table from "$lib/components/ui/table";
@@ -12,6 +12,7 @@
   import * as AlertDialog from "$lib/components/ui/alert-dialog";
 
   import { productRequests } from "$lib/services/api-requests/product";
+  import { stockRequests } from "$lib/services/api-requests/stock";
 
   import type { Product, ProductWithStocks } from "$lib/types/api-returns/product";
   import type { ProductFindManySortArgs, ProductFindManyWhereArgs } from "$lib/types/findManyArgs";
@@ -55,6 +56,11 @@
   // Estados para Visualização de Estoque Detalhado
   let stockSheetOpen = $state(false);
   let selectedProductStocks = $state<ProductWithStocks | null>(null);
+
+  // Estados pra alteração de quantidade em estoque
+  let editingStockId = $state<string | null>(null); // ID do warehouse que está sendo editado
+  let newAmount = $state<number>(0);
+  let updatingStock = $state(false);
 
   function openStockDetails(product: ProductWithStocks) {
     selectedProductStocks = product;
@@ -102,6 +108,37 @@
       observations: product.observations as string | null,
     };
     open = true;
+  }
+
+  async function handleUpdateStock(warehouseId: string, productId: string) {
+    updatingStock = true;
+    try {
+      await stockRequests.create({
+        warehouse_id: warehouseId,
+        product_id: productId,
+        amount: newAmount,
+      });
+
+      toast.success("Estoque atualizado!");
+      editingStockId = null;
+
+      // Recarrega os produtos para atualizar os números na tabela principal e no Sheet
+      await loadProducts();
+
+      // Atualiza o objeto selecionado para o Sheet refletir a mudança imediatamente
+      if (selectedProductStocks) {
+        selectedProductStocks = products.find((p) => p.id === selectedProductStocks?.id) || null;
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erro ao atualizar estoque");
+    } finally {
+      updatingStock = false;
+    }
+  }
+
+  function startEditing(warehouseId: string, currentAmount: number) {
+    editingStockId = warehouseId;
+    newAmount = currentAmount;
   }
 
   function confirmDelete(product: Product) {
@@ -236,11 +273,11 @@
 </Sheet.Root>
 
 <Sheet.Root bind:open={stockSheetOpen}>
-  <Sheet.Content side="right" class="w-[400px]">
+  <Sheet.Content side="right" class="w-[400px] sm:w-[500px]">
     <Sheet.Header>
       <Sheet.Title>Distribuição em Estoque</Sheet.Title>
       <Sheet.Description>
-        Detalhamento do produto: <span class="font-bold text-foreground">{selectedProductStocks?.description}</span>
+        Ajuste o saldo do produto <span class="font-bold text-foreground">{selectedProductStocks?.description}</span>.
       </Sheet.Description>
     </Sheet.Header>
 
@@ -250,7 +287,7 @@
           <Table.Header>
             <Table.Row>
               <Table.Head>Estoque</Table.Head>
-              <Table.Head class="text-right">Qtd</Table.Head>
+              <Table.Head class="text-right w-[150px]">Qtd</Table.Head>
             </Table.Row>
           </Table.Header>
           <Table.Body>
@@ -258,27 +295,82 @@
               {#each selectedProductStocks.stocks as stock}
                 <Table.Row>
                   <Table.Cell class="font-medium">{stock.warehouse_description}</Table.Cell>
-                  <Table.Cell class="text-right">{stock.amount}</Table.Cell>
+                  <Table.Cell class="text-right py-2">
+                    <div class="group flex items-center justify-end gap-1">
+                      <div class="flex items-center gap-0.5">
+                        {#if editingStockId === stock.warehouse_id}
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            class="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                            onclick={() => (editingStockId = null)}
+                            disabled={updatingStock}
+                            title="Descartar alterações"
+                          >
+                            <X class="h-4 w-4" />
+                          </Button>
+
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            class="h-8 w-8 text-primary hover:bg-primary/10"
+                            onclick={() => handleUpdateStock(stock.warehouse_id, selectedProductStocks!.id)}
+                            disabled={updatingStock}
+                          >
+                            {#if updatingStock}
+                              <Loader2 class="h-4 w-4 animate-spin" />
+                            {:else}
+                              <Save class="h-4 w-4" />
+                            {/if}
+                          </Button>
+                        {:else}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            class="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onclick={() => startEditing(stock.warehouse_id, stock.amount)}
+                          >
+                            <Pencil class="h-3.5 w-3.5" />
+                          </Button>
+                        {/if}
+                      </div>
+
+                      <div class="relative min-w-[70px]">
+                        {#if editingStockId === stock.warehouse_id}
+                          <Input
+                            type="number"
+                            inputmode="numeric"
+                            pattern="[0-9]*"
+                            bind:value={newAmount}
+                            selectOnFocus={true}
+                            disabled={updatingStock}
+                            onkeydown={(e) => {
+                              if (e.key === "Enter") handleUpdateStock(stock.warehouse_id, selectedProductStocks!.id);
+                              if (e.key === "Escape") editingStockId = null; // Atalho de teclado para descartar
+                            }}
+                            class="h-8 w-full text-right font-mono border-primary/50 bg-background focus-visible:ring-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          />
+                        {:else}
+                          <Input
+                            type="number"
+                            value={stock.amount}
+                            readonly
+                            class="h-8 w-full text-right font-mono border-transparent bg-transparent shadow-none group-hover:border-muted focus-visible:ring-0 cursor-default [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          />
+                        {/if}
+                      </div>
+                    </div>
+                  </Table.Cell>
                 </Table.Row>
               {/each}
               <Table.Row class="bg-muted/50 font-bold">
                 <Table.Cell>Total Geral</Table.Cell>
                 <Table.Cell class="text-right">{selectedProductStocks.total_in_stocks}</Table.Cell>
               </Table.Row>
-            {:else}
-              <Table.Row>
-                <Table.Cell colspan={2} class="text-center py-8 text-muted-foreground italic">
-                  Este produto não possui saldo em nenhum estoque.
-                </Table.Cell>
-              </Table.Row>
-            {/if}
+            {:else}{/if}
           </Table.Body>
         </Table.Root>
       </div>
-    </div>
-
-    <div class="flex justify-end gap-3 mt-4">
-      <Button variant="outline" onclick={() => (stockSheetOpen = false)} type="button">Voltar</Button>
     </div>
   </Sheet.Content>
 </Sheet.Root>
