@@ -26,7 +26,7 @@ const envSchema = z.object({
     FRONTEND_URL_PREVIEW: z.url().default("http://localhost:4173"),
     FRONTEND_URL_PROD: z
         .url()
-        .default("https://frontend-staging-f01.pages.dev"),
+        .default("https://base-monorepo.pages.dev"),
 });
 
 const _env = envSchema.safeParse(process.env);
