@@ -296,38 +296,39 @@
                 <Table.Row>
                   <Table.Cell class="font-medium">{stock.warehouse_description}</Table.Cell>
                   <Table.Cell class="text-right py-2">
-                    <div class="group flex items-center justify-end gap-1">
-                      <div class="flex items-center gap-0.5">
+                    <div class="flex items-center justify-end gap-1">
+                      <div class="flex items-center justify-end w-[72px]">
                         {#if editingStockId === stock.warehouse_id}
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            class="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                            onclick={() => (editingStockId = null)}
-                            disabled={updatingStock}
-                            title="Descartar alterações"
-                          >
-                            <X class="h-4 w-4" />
-                          </Button>
+                          <div class="flex items-center gap-0.5">
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              class="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                              onclick={() => (editingStockId = null)}
+                              disabled={updatingStock}
+                            >
+                              <X class="h-4 w-4" />
+                            </Button>
 
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            class="h-8 w-8 text-primary hover:bg-primary/10"
-                            onclick={() => handleUpdateStock(stock.warehouse_id, selectedProductStocks!.id)}
-                            disabled={updatingStock}
-                          >
-                            {#if updatingStock}
-                              <Loader2 class="h-4 w-4 animate-spin" />
-                            {:else}
-                              <Save class="h-4 w-4" />
-                            {/if}
-                          </Button>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              class="h-8 w-8 text-primary hover:bg-primary/10"
+                              onclick={() => handleUpdateStock(stock.warehouse_id, selectedProductStocks!.id)}
+                              disabled={updatingStock}
+                            >
+                              {#if updatingStock}
+                                <Loader2 class="h-4 w-4 animate-spin" />
+                              {:else}
+                                <Save class="h-4 w-4" />
+                              {/if}
+                            </Button>
+                          </div>
                         {:else}
                           <Button
                             variant="ghost"
                             size="icon"
-                            class="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                            class="h-8 w-8 text-muted-foreground/60 hover:text-primary hover:bg-primary/10 transition-colors"
                             onclick={() => startEditing(stock.warehouse_id, stock.amount)}
                           >
                             <Pencil class="h-3.5 w-3.5" />
@@ -335,7 +336,7 @@
                         {/if}
                       </div>
 
-                      <div class="relative min-w-[70px]">
+                      <div class="relative w-20">
                         {#if editingStockId === stock.warehouse_id}
                           <Input
                             type="number"
@@ -346,7 +347,7 @@
                             disabled={updatingStock}
                             onkeydown={(e) => {
                               if (e.key === "Enter") handleUpdateStock(stock.warehouse_id, selectedProductStocks!.id);
-                              if (e.key === "Escape") editingStockId = null; // Atalho de teclado para descartar
+                              if (e.key === "Escape") editingStockId = null;
                             }}
                             class="h-8 w-full text-right font-mono border-primary/50 bg-background focus-visible:ring-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           />
@@ -355,7 +356,7 @@
                             type="number"
                             value={stock.amount}
                             readonly
-                            class="h-8 w-full text-right font-mono border-transparent bg-transparent shadow-none group-hover:border-muted focus-visible:ring-0 cursor-default [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            class="h-8 w-full text-right font-mono border-transparent bg-transparent shadow-none focus-visible:ring-0 cursor-default [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           />
                         {/if}
                       </div>
