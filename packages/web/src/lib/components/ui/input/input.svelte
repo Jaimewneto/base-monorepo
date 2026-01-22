@@ -12,11 +12,14 @@
             (
                 | { type: "file"; files?: FileList }
                 | { type?: InputType; files?: undefined }
-            )
+            ) & {
+                selectOnFocus?: boolean;
+            }
     >;
 
     let {
         ref = $bindable(null),
+        selectOnFocus = false,
         value = $bindable(),
         type,
         files = $bindable(),
@@ -24,6 +27,14 @@
         "data-slot": dataSlot = "input",
         ...restProps
     }: Props = $props();
+
+    $effect(() => {
+        if (ref && selectOnFocus) {
+            const inputElement = ref as HTMLInputElement;
+            inputElement.focus();
+            inputElement.select();
+        }
+    });
 </script>
 
 {#if type === "file"}

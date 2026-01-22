@@ -10,7 +10,7 @@
         "check:svelte": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json",
         "lint": "pnpm biome lint .",
         "format": "pnpm biome format --write .",
-        "check:biome": "pnpm biome check --write."
+        "check:biome": "pnpm biome check --write ."
     },
     "devDependencies": {
         "@biomejs/biome": "2.3.11",

@@ -1,11 +1,7 @@
 import pino from "pino";
 
 export const logger = pino({
-    // Nível mínimo de log (info, debug, error, etc)
-    level: process.env.LOG_LEVEL || "info",
-
-    // No desenvolvimento, usamos o pino-pretty para legibilidade.
-    // Em produção, deixamos o JSON puro para máxima performance.
+    level: "info",
     transport:
         process.env.NODE_ENV !== "production"
             ? {

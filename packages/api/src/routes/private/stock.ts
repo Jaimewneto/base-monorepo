@@ -41,4 +41,17 @@ export const stockRoutes = new Hono()
                 }),
             );
         },
+    )
+    .post(
+        "/",
+        zodValidate({ target: "json", schema: validations.createOrUpdate }),
+        async (c) => {
+            const params = c.req.valid("json");
+
+            return c.json(
+                successResponse({
+                    data: await stockController.createOrUpdate(params),
+                }),
+            );
+        },
     );

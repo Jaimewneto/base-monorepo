@@ -25,6 +25,7 @@ export async function up(db: Kysely<Database>): Promise<void> {
         )
         .addColumn("entry", "numeric", (col) => col.notNull().defaultTo(0))
         .addColumn("exit", "numeric", (col) => col.notNull().defaultTo(0))
+        .addColumn("description", "text", (col) => col.notNull())
         .addColumn("created_at", "timestamptz", (col) =>
             col.defaultTo(sql`now()`),
         )

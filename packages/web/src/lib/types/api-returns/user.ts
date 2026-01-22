@@ -1,3 +1,3 @@
-import { userRequests } from "../../services/api-requests/user";
+import type { userRequests } from "../../services/api-requests/user";
 
 export type User = Awaited<ReturnType<typeof userRequests.findOneById>>;
