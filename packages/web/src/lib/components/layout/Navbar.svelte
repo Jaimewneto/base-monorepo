@@ -1,17 +1,8 @@
 <script lang="ts">
   import { LogOut, Moon, Sun, Package, Users, Warehouse, Menu } from "@lucide/svelte";
   import { router, active } from "tinro";
-  import { Button } from "$lib/components/ui/button";
+  import { Menu as MenuComponent, Portal } from "@skeletonlabs/skeleton-svelte";
   import { authStore } from "$lib/auth/auth.store";
-  import * as NavigationMenu from "$lib/components/ui/navigation-menu";
-  import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
-
-  interface Props {
-    toggleTheme: () => void;
-    isDark: boolean;
-  }
-
-  let { toggleTheme, isDark }: Props = $props();
 
   const handleLogout = () => {
     authStore.logout();
@@ -23,78 +14,103 @@
     { href: "/warehouses", label: "Estoques", icon: Warehouse },
     { href: "/users", label: "Usuários", icon: Users },
   ];
+
+  // Dark mode toggle usando color-scheme
+  let isDark = $state(false);
+
+  $effect(() => {
+    const mode = localStorage.getItem("mode") || "light";
+    isDark = mode === "dark";
+    document.documentElement.style.colorScheme = mode;
+  });
+
+  const toggleTheme = () => {
+    isDark = !isDark;
+    const mode = isDark ? "dark" : "light";
+    document.documentElement.style.colorScheme = mode;
+    localStorage.setItem("mode", mode);
+  };
 </script>
 
-<header class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+<svelte:head>
+  <script>
+    const mode = localStorage.getItem("mode") || "light";
+    document.documentElement.style.colorScheme = mode;
+  </script>
+</svelte:head>
+
+<header class="sticky top-0 z-50 w-full border-b border-surface-200-800 bg-surface-50-950/95 backdrop-blur">
   <div class="container mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
     <div class="flex items-center gap-4 md:gap-8">
+      <!-- Mobile Menu -->
       <div class="md:hidden">
-        <DropdownMenu.Root>
-          <DropdownMenu.Trigger>
-            {#snippet child({ props })}
-              <Button {...props} variant="ghost" size="icon">
-                <Menu class="h-6 w-6" />
-              </Button>
-            {/snippet}
-          </DropdownMenu.Trigger>
-
-          <DropdownMenu.Content align="start" class="w-48">
-            {#each navLinks as link}
-              <DropdownMenu.Item onSelect={() => router.goto(link.href)}>
-                <link.icon class="mr-2 h-4 w-4" />
-                {link.label}
-              </DropdownMenu.Item>
-            {/each}
-          </DropdownMenu.Content>
-        </DropdownMenu.Root>
+        <MenuComponent positioning={{ placement: "bottom-start" }}>
+          <MenuComponent.Trigger class="btn-icon btn-icon-sm preset-tonal-surface-500">
+            <Menu class="h-6 w-6" />
+          </MenuComponent.Trigger>
+          <Portal>
+            <MenuComponent.Content class="card preset-outlined-surface-500 p-2 w-48 shadow-xl">
+              {#each navLinks as link}
+                <MenuComponent.Item
+                  value={link.href}
+                  class="flex items-center gap-2 px-4 py-2 rounded hover:preset-filled-surface-500 cursor-pointer"
+                  onclick={() => router.goto(link.href)}
+                >
+                  <link.icon class="h-4 w-4" />
+                  <span>{link.label}</span>
+                </MenuComponent.Item>
+              {/each}
+            </MenuComponent.Content>
+          </Portal>
+        </MenuComponent>
       </div>
 
+      <!-- Logo -->
       <a href="/" class="flex items-center gap-2 font-bold text-lg md:text-xl tracking-tighter shrink-0">
-        <div class="bg-primary text-primary-foreground p-1 rounded">
+        <div class="preset-filled-primary-500 p-1 rounded">
           <Package class="h-5 w-5" />
         </div>
-        <span class="block truncate max-w-[150px] sm:max-w-none"> Gestão de estoque </span>
+        <span class="block truncate max-w-[150px] sm:max-w-none">Gestão de estoque</span>
       </a>
 
-      <NavigationMenu.Root class="hidden md:flex">
-        <NavigationMenu.List class="flex items-center space-x-1">
-          {#each navLinks as link}
-            <NavigationMenu.Item>
-              <a
-                href={link.href}
-                use:active
-                class="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground data-[active]:bg-accent/50 data-[active]:text-primary"
-              >
-                <link.icon class="mr-2 h-4 w-4" />
-                {link.label}
-              </a>
-            </NavigationMenu.Item>
-          {/each}
-        </NavigationMenu.List>
-      </NavigationMenu.Root>
+      <!-- Desktop Navigation -->
+      <nav class="hidden md:flex items-center space-x-1">
+        {#each navLinks as link}
+          <a
+            href={link.href}
+            use:active
+            class="group inline-flex h-9 w-max items-center justify-center gap-2 rounded-md bg-surface-50-950 px-4 py-2 text-sm font-medium transition-colors hover:preset-tonal-surface-500 data-[active]:preset-filled-surface-500"
+          >
+            <link.icon class="h-4 w-4" />
+            <span>{link.label}</span>
+          </a>
+        {/each}
+      </nav>
     </div>
 
+    <!-- Right side actions -->
     <div class="flex items-center gap-2 md:gap-4">
-      <Button variant="ghost" size="icon" onclick={toggleTheme} class="rounded-full">
+      <!-- Theme Toggle -->
+      <button type="button" class="btn-icon btn-icon-sm preset-tonal-surface-500 rounded-full" onclick={toggleTheme} aria-label="Alternar tema">
         {#if isDark}
           <Sun class="h-5 w-5" />
         {:else}
           <Moon class="h-5 w-5" />
         {/if}
-      </Button>
+      </button>
 
-      <div class="flex items-center ml-2 text-primary">
-        <Button
-          variant="outline"
-          size="sm"
-          onclick={handleLogout}
-          class="gap-2 border-destructive/50 hover:bg-destructive hover:text-destructive-foreground hidden sm:flex"
-        >
-          <LogOut class="h-4 w-4" /> Sair
-        </Button>
-        <Button variant="ghost" size="icon" onclick={handleLogout} class="sm:hidden text-destructive">
+      <!-- Logout Button -->
+      <div class="flex items-center ml-2">
+        <!-- Desktop Logout -->
+        <button type="button" class="btn preset-outlined-error-500 btn-sm gap-2 hidden sm:flex" onclick={handleLogout}>
+          <LogOut class="h-4 w-4" />
+          <span>Sair</span>
+        </button>
+
+        <!-- Mobile Logout -->
+        <button type="button" class="btn-icon btn-icon-sm preset-tonal-error-500 sm:hidden" onclick={handleLogout} aria-label="Sair">
           <LogOut class="h-5 w-5" />
-        </Button>
+        </button>
       </div>
     </div>
   </div>

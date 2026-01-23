@@ -6,8 +6,8 @@ import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
     plugins: [
-        svelte(),
         tailwindcss(),
+        svelte(),
         VitePWA({
             registerType: "autoUpdate",
             includeAssets: ["favicon.svg"],

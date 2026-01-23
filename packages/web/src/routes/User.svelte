@@ -1,13 +1,9 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { toast } from "svelte-sonner";
-  import { Loader2, UserPlus, Pencil, Save, Trash2 } from "@lucide/svelte";
+  import { Loader2, UserPlus, Pencil, Save, X } from "@lucide/svelte";
+  import { Dialog, Portal } from "@skeletonlabs/skeleton-svelte";
 
-  import { Button } from "$lib/components/ui/button";
-  import * as Table from "$lib/components/ui/table";
-  import * as Sheet from "$lib/components/ui/sheet";
-  import { Input } from "$lib/components/ui/input";
-  import { Label } from "$lib/components/ui/label";
   import DataTable from "$lib/components/DataTable.svelte";
 
   import { userRequests } from "$lib/services/api-requests/user";
@@ -15,6 +11,8 @@
   import type { User } from "$lib/types/api-returns/user";
   import type { Column, WhereField, SortField } from "$lib/types/components/DataTable";
   import type { UserFindManyWhereArgs, UserFindManySortArgs } from "$lib/types/findManyArgs";
+
+  let dialogOpen = $state(false);
 
   let totalRecords = $state(0);
   let currentPage = $state(1);
@@ -71,7 +69,6 @@
     loadUsers();
   }
 
-  let open = $state(false);
   let saving = $state(false);
   let userToEdit = $state<User | null>(null);
 
@@ -84,13 +81,13 @@
   function openCreate() {
     userToEdit = null;
     formData = { name: "", email: "", password: "" };
-    open = true;
+    dialogOpen = true;
   }
 
   function openEdit(user: User) {
     userToEdit = user;
     formData = { name: user.name, email: user.email, password: "" };
-    open = true;
+    dialogOpen = true;
   }
 
   async function handleSubmit(e: Event) {
@@ -105,7 +102,7 @@
       } else {
         await userRequests.create(formData);
       }
-      open = false;
+      dialogOpen = false;
       await loadUsers();
       toast.success("Usuário salvo com sucesso");
     } catch (err) {
@@ -121,68 +118,80 @@
 <div class="space-y-6">
   <div class="flex items-center justify-between">
     <h2 class="text-3xl font-bold tracking-tight">Usuários</h2>
-    <Button size="sm" onclick={openCreate}>
-      <UserPlus class="mr-2 h-4 w-4" /> Novo usuário
-    </Button>
+    <button type="button" class="btn preset-filled-primary-500" onclick={openCreate}>
+      <UserPlus class="mr-2 h-4 w-4" />
+      <span>Novo usuário</span>
+    </button>
   </div>
 
   <DataTable {columns} data={users} {loading} onQueryChange={handleQueryChange} page={currentPage} limit={pageLimit} total={totalRecords}>
-    {#each users as user}
-      <Table.Row>
-        <Table.Cell>{user.name}</Table.Cell>
-        <Table.Cell>{user.email}</Table.Cell>
-        <Table.Cell class="text-right">
-          <div class="flex justify-end gap-2">
-            <Button variant="ghost" size="icon" onclick={() => openEdit(user)}>
-              <Pencil class="h-4 w-4" />
-            </Button>
-          </div>
-        </Table.Cell>
-      </Table.Row>
-    {/each}
+    {#snippet children()}
+      {#each users as user}
+        <tr class="hover:bg-primary-500/5 transition-colors">
+          <td class="!align-middle">{user.name}</td>
+          <td class="!align-middle">{user.email}</td>
+          <td class="text-right !align-middle">
+            <div class="flex justify-end gap-2">
+              <button
+                type="button"
+                class="btn-icon btn-icon-sm preset-tonal-surface-500 hover:preset-filled-primary-500"
+                onclick={() => openEdit(user)}
+              >
+                <Pencil class="size-4" />
+              </button>
+            </div>
+          </td>
+        </tr>
+      {/each}
+    {/snippet}
   </DataTable>
 </div>
 
-<!-- Sheet -->
-<Sheet.Root bind:open>
-  <Sheet.Content side="right" class="w-[400px] sm:w-[540px]">
-    <Sheet.Header>
-      <Sheet.Title>{userToEdit ? "Editar usuário" : "Novo usuário"}</Sheet.Title>
-      <Sheet.Description>
-        {userToEdit ? "Altere as informações do usuário selecionado." : "Preencha os dados para cadastrar um novo usuário."}
-      </Sheet.Description>
-    </Sheet.Header>
+<!-- Dialog Form -->
+<Dialog open={dialogOpen} onOpenChange={(e) => (dialogOpen = e.open)}>
+  <Portal>
+    <Dialog.Backdrop class="fixed inset-0 z-50 bg-surface-50-950/50" />
+    <Dialog.Positioner class="fixed inset-0 z-50 flex justify-end items-start">
+      <Dialog.Content class="bg-surface-100-900 w-full sm:w-[540px] h-full p-6 space-y-6 shadow-xl overflow-y-auto">
+        <header class="space-y-2">
+          <Dialog.Title class="h3">{userToEdit ? "Editar usuário" : "Novo usuário"}</Dialog.Title>
+          <Dialog.Description class="text-surface-600-300">
+            {userToEdit ? "Altere as informações do usuário selecionado." : "Preencha os dados para cadastrar um novo usuário."}
+          </Dialog.Description>
+        </header>
 
-    <form onsubmit={handleSubmit} class="grid gap-4 py-6">
-      <div class="grid gap-2">
-        <Label for="name">Nome</Label>
-        <Input id="name" bind:value={formData.name} required />
-      </div>
+        <form onsubmit={handleSubmit} class="space-y-4">
+          <label class="label">
+            <span class="label-text">Nome</span>
+            <input class="input" type="text" bind:value={formData.name} required placeholder="Nome do usuário" />
+          </label>
 
-      <div class="grid gap-2">
-        <Label for="email">Email</Label>
-        <Input id="email" type="email" bind:value={formData.email} disabled={!!userToEdit} required />
-      </div>
+          <label class="label">
+            <span class="label-text">Email</span>
+            <input class="input" type="email" bind:value={formData.email} disabled={!!userToEdit} required placeholder="email@exemplo.com" />
+          </label>
 
-      {#if !userToEdit}
-        <div class="grid gap-2">
-          <Label for="password">Senha inicial</Label>
-          <Input id="password" type="password" bind:value={formData.password} required />
-        </div>
-      {/if}
-
-      <div class="flex justify-end gap-3 mt-4">
-        <Button variant="outline" type="button" onclick={() => (open = false)}>Cancelar</Button>
-        <Button type="submit" disabled={saving}>
-          {#if saving}
-            <Loader2 class="mr-2 h-4 w-4 animate-spin" />
-            Salvando...
-          {:else}
-            <Save class="mr-2 h-4 w-4" />
-            Salvar
+          {#if !userToEdit}
+            <label class="label">
+              <span class="label-text">Senha inicial</span>
+              <input class="input" type="password" bind:value={formData.password} required placeholder="••••••••" />
+            </label>
           {/if}
-        </Button>
-      </div>
-    </form>
-  </Sheet.Content>
-</Sheet.Root>
+
+          <div class="flex justify-end gap-3 pt-4">
+            <button type="button" class="btn preset-outlined-surface-500" onclick={() => (dialogOpen = false)}> Cancelar </button>
+            <button type="submit" class="btn preset-filled-primary-500" disabled={saving}>
+              {#if saving}
+                <Loader2 class="mr-2 h-4 w-4 animate-spin" />
+                <span>Salvando...</span>
+              {:else}
+                <Save class="mr-2 h-4 w-4" />
+                <span>Salvar</span>
+              {/if}
+            </button>
+          </div>
+        </form>
+      </Dialog.Content>
+    </Dialog.Positioner>
+  </Portal>
+</Dialog>
