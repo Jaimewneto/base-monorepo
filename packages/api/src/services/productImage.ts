@@ -61,7 +61,16 @@ export const productImageService = {
                         (img) => img.id === item.id,
                     );
 
-                    if (exists) continue;
+                    if (exists) {
+                        repo.updateById({
+                            id: (item as ProductImage).id,
+                            data: {
+                                main: item.main,
+                            }
+                        })
+                    }
+
+                    continue;
                 }
 
                 await repo.create(item as ProductImageCreate);

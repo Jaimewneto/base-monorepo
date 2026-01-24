@@ -121,7 +121,7 @@
     };
     productImages = product.images;
     productImagefiles = [];
-    renderedImages = product.images.map((img) => ({ type: "url", url: img.url, id: img.id }));
+    renderedImages = product.images.map((img) => ({ type: "url", url: img.url, id: img.id, isMain: img.main }));
     open = true;
   }
 
@@ -182,22 +182,31 @@
         uploadedUrls.push(url);
       }
 
+      const hasMainSelected = renderedImages.some((img) => img.isMain);
+
       // Construir objeto final de imagens para inserir no backend
       const finalImages: ProductImageInsertMany = [
+        // imagens já existentes (URL)
         ...renderedImages
           .filter((img) => img.type === "url")
           .map((img) => ({
             id: img.id,
             company_id: newProduct.company_id,
             product_id: newProduct.id,
-            url: (img as { type: "url"; url: string }).url,
-            main: false,
+            url: img.url,
+            main: !!img.isMain,
           })),
+
+        // imagens novas (upload)
         ...uploadedUrls.map((url, index) => ({
           company_id: newProduct.company_id,
           product_id: newProduct.id,
           url,
-          main: index === 0 && renderedImages.length === 0, // primeira imagem principal apenas se não houver URL antiga
+
+          // regra de main
+          main: hasMainSelected
+            ? false // se já existe main, uploads nunca viram main automaticamente
+            : index === 0 && renderedImages.length === 0, // fallback absoluto
         })),
       ];
 
@@ -313,6 +322,7 @@
 
         <ProductImagePicker
           images={renderedImages}
+          enableMainImage
           onChange={(newImages: ImageItem[]) => {
             renderedImages = newImages;
             // Mantém apenas arquivos locais em productImagefiles para upload
