@@ -2,6 +2,7 @@ import type { AuditTable } from "./schema/audit.js";
 import type { CardexTable } from "./schema/cardex.js";
 import type { CompanyTable } from "./schema/company.js";
 import type { ProductTable } from "./schema/product.js";
+import type { ProductImageTable } from "./schema/productImage.js";
 import type { StockTable } from "./schema/stock.js";
 import type { UserTable } from "./schema/user.js";
 import type { WarehouseTable } from "./schema/warehouse.js";
@@ -118,6 +119,22 @@ const _checkWarehouseKeys: AssertAllKeysPresent<
     typeof warehouseTableKeys
 > = true;
 
+export const productImageTableKeys = [
+    "id",
+    "company_id",
+    "product_id",
+    "url",
+    "main",
+    "created_at",
+    "updated_at",
+    "deleted_at",
+] as const satisfies (keyof ProductImageTable)[];
+
+const _checkProductImageKeys: AssertAllKeysPresent<
+    ProductImageTable,
+    typeof productImageTableKeys
+> = true;
+
 export const database = {
     auditTable: {
         name: "audit",
@@ -146,5 +163,9 @@ export const database = {
     warehouseTable: {
         name: "warehouse",
         keys: warehouseTableKeys,
+    },
+    productImageTable: {
+        name: "product_image",
+        keys: productImageTableKeys,
     },
 } as const;

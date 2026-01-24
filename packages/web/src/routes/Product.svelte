@@ -18,6 +18,11 @@
   import type { ProductFindManySortArgs, ProductFindManyWhereArgs } from "$lib/types/findManyArgs";
   import type { Column, SortField, WhereField } from "$lib/types/components/DataTable";
 
+  import ProductImagePicker, { type ImageItem } from "$lib/components/ProductImagePicker.svelte";
+  import { uploadImage } from "$lib/services/image.uploader";
+  import type { ProductImageInsertMany } from "$lib/types/productImage";
+  import { productImageRequests } from "$lib/services/api-requests/productImage";
+
   // Estados da Lista
   let totalRecords = $state(0);
   let currentPage = $state(1);
@@ -62,6 +67,11 @@
   let newAmount = $state<number>(0);
   let updatingStock = $state(false);
 
+  // Imagens
+  let productImagefiles = $state<File[]>([]);
+  let productImages = $state<ProductImageInsertMany>([]);
+  let renderedImages = $state<ImageItem[]>([]);
+
   function openStockDetails(product: ProductWithStocks) {
     selectedProductStocks = product;
     stockSheetOpen = true;
@@ -96,10 +106,12 @@
   function openCreate() {
     productToEdit = null;
     formData = { description: "", internal_code: "", sku: "", observations: null };
+    productImages = [];
+    productImagefiles = [];
     open = true;
   }
 
-  function openEdit(product: Product) {
+  function openEdit(product: ProductWithStocks) {
     productToEdit = product;
     formData = {
       description: product.description,
@@ -107,6 +119,9 @@
       sku: product.sku,
       observations: product.observations as string | null,
     };
+    productImages = product.images;
+    productImagefiles = [];
+    renderedImages = product.images.map((img) => ({ type: "url", url: img.url, id: img.id }));
     open = true;
   }
 
@@ -149,15 +164,48 @@
   async function handleSubmit(e: Event) {
     e.preventDefault();
     saving = true;
+
     try {
+      let newProduct: Product | undefined;
+
       if (productToEdit) {
         await productRequests.updateOneById({ id: productToEdit.id, ...formData });
+        newProduct = productToEdit;
       } else {
-        await productRequests.create(formData);
+        newProduct = await productRequests.create(formData);
       }
+
+      // Upload de arquivos novos
+      const uploadedUrls: string[] = [];
+      for (const file of productImagefiles) {
+        const url = await uploadImage({ file, bucket: "product-images" });
+        uploadedUrls.push(url);
+      }
+
+      // Construir objeto final de imagens para inserir no backend
+      const finalImages: ProductImageInsertMany = [
+        ...renderedImages
+          .filter((img) => img.type === "url")
+          .map((img) => ({
+            id: img.id,
+            company_id: newProduct.company_id,
+            product_id: newProduct.id,
+            url: (img as { type: "url"; url: string }).url,
+            main: false,
+          })),
+        ...uploadedUrls.map((url, index) => ({
+          company_id: newProduct.company_id,
+          product_id: newProduct.id,
+          url,
+          main: index === 0 && renderedImages.length === 0, // primeira imagem principal apenas se não houver URL antiga
+        })),
+      ];
+
+      if (finalImages.length > 0) await productImageRequests.insertMany(finalImages);
+
+      toast.success("Produto salvo com sucesso!");
       open = false;
       await loadProducts();
-      toast.success("Produto salvo com sucesso");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Erro ao salvar produto");
     } finally {
@@ -183,6 +231,10 @@
     } finally {
       deleting = false;
     }
+  }
+
+  function onImagesChange(files: File[]) {
+    productImagefiles = files;
   }
 
   onMount(loadProducts);
@@ -254,6 +306,19 @@
       <div class="grid gap-2">
         <Label for="observations">Observações</Label>
         <Input id="observations" bind:value={formData.observations} placeholder="Observações sobre o produto" />
+      </div>
+
+      <div class="grid gap-2">
+        <Label>Imagens do produto</Label>
+
+        <ProductImagePicker
+          images={renderedImages}
+          onChange={(newImages: ImageItem[]) => {
+            renderedImages = newImages;
+            // Mantém apenas arquivos locais em productImagefiles para upload
+            productImagefiles = newImages.filter((i) => i.type === "file").map((i) => i.file);
+          }}
+        />
       </div>
 
       <div class="flex justify-end gap-3 mt-4">

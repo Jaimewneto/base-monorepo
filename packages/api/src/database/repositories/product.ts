@@ -5,6 +5,7 @@ import { hasCompanyIdColumn } from "../../utils/repository.js";
 import { client } from "../client.js";
 import type { Database } from "../schema/index.js";
 import { baseRepository } from "./baseRepository.js";
+import type { ProductImage } from "../schema/productImage.js";
 
 const tableName = "product" as const;
 
@@ -15,6 +16,11 @@ type WarehouseStock = {
     warehouse_description: string;
     amount: number;
 };
+
+type SimplifiedImage = Pick<
+    ProductImage,
+    "id" | "company_id" | "product_id" | "url" | "main"
+>;
 
 const base = (db = client) =>
     baseRepository<TableName>({
@@ -88,6 +94,35 @@ export const productRepository = (db = client) => ({
                         .as("warehouse_stocks"),
                 (join) => join.onTrue(),
             )
+            .leftJoinLateral(
+                (eb) =>
+                    eb
+                        .selectFrom("product_image as pi")
+                        .select([
+                            sql`
+                                coalesce(
+                                    json_agg(
+                                        json_build_object(
+                                            'id', pi.id,
+                                            'company_id', pi.company_id,
+                                            'product_id', pi.product_id,
+                                            'url', pi.url,
+                                            'main', pi.main
+                                        )
+                                    ),
+                                    '[]'::json
+                                )
+                            `.as("images"),
+                        ])
+                        .whereRef(
+                            "pi.product_id",
+                            "=",
+                            `${tableName}.id`,
+                        )
+                        .where("pi.deleted_at", "is", null)
+                        .as("images"),
+                (join) => join.onTrue(),
+            )
             .selectAll(tableName)
             .select([
                 sql<number>`coalesce(warehouse_stocks.total_in_stocks, 0)::float8`.as(
@@ -96,6 +131,9 @@ export const productRepository = (db = client) => ({
                 sql<
                     WarehouseStock[]
                 >`coalesce(warehouse_stocks.stocks, '[]'::json)`.as("stocks"),
+                sql<
+                    SimplifiedImage[]
+                >`coalesce(images.images, '[]'::json)`.as("images"),
             ])
             .where(`${tableName}.deleted_at`, "is", null);
 

@@ -36,7 +36,9 @@
     },
     "dependencies": {
         "@base-monorepo/api-client": "workspace:*",
+        "@supabase/supabase-js": "^2.91.1",
         "tinro": "^0.6.12",
+        "uuid": "^13.0.0",
         "zod": "^4.3.5"
     }
 }

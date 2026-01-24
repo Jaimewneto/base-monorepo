@@ -7,10 +7,12 @@ import {
 } from "../../utils/http-response.js";
 import { zodValidate } from "../../utils/zodValidator.js";
 import { productRequestsValidations } from "../../validations/http-requests/product.js";
+import { productImageRoutes } from "./productImage.js";
 
 const validations = productRequestsValidations();
 
 export const productRoutes = new Hono()
+    .route("/image", productImageRoutes)
     .get(
         "/:id",
         zodValidate({ target: "param", schema: validations.findOneById }),

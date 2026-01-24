@@ -4,6 +4,7 @@ import type { AuditTable } from "./audit.js";
 import type { CardexTable } from "./cardex.js";
 import type { CompanyTable } from "./company.js";
 import type { ProductTable } from "./product.js";
+import type { ProductImageTable } from "./productImage.js";
 import type { StockTable } from "./stock.js";
 import type { UserTable } from "./user.js";
 import type { WarehouseTable } from "./warehouse.js";
@@ -16,6 +17,7 @@ export interface Database {
     stock: StockTable;
     user: UserTable;
     warehouse: WarehouseTable;
+    product_image: ProductImageTable;
 }
 
 export type Record<T extends keyof Database> = Selectable<Database[T]>;
