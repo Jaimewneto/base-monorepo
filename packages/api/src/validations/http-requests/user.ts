@@ -1,7 +1,7 @@
 import z from "zod/v4";
 import { database } from "../../database/constSchema.js";
 import type {
-    UserCreateWithoutCompanyId,
+    UserCreateWithoutTenantId,
     UserUpdate,
 } from "../../database/schema/user.js";
 import type { CheckSchema } from "../../types/validation.js";
@@ -24,7 +24,7 @@ export const userRequestsValidations = () => {
         name: z.string().min(2).max(100),
         email: z.email(),
         password: z.string().min(6).max(100),
-    } satisfies CheckSchema<UserCreateWithoutCompanyId>);
+    } satisfies CheckSchema<UserCreateWithoutTenantId>);
 
     const updateById = z.object({
         name: z.string().min(2).max(100).optional(),

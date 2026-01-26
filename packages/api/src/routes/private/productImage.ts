@@ -10,18 +10,17 @@ import { productImageRequestsValidations } from "../../validations/http-requests
 
 const validations = productImageRequestsValidations();
 
-export const productImageRoutes = new Hono()
-    .post(
-        "/",
-        zodValidate({ target: "json", schema: validations.insertMany }),
-        async (c) => {
-            const data = c.req.valid("json");
+export const productImageRoutes = new Hono().post(
+    "/",
+    zodValidate({ target: "json", schema: validations.insertMany }),
+    async (c) => {
+        const data = c.req.valid("json");
 
-            return c.json(
-                successResponse({
-                    data: await productImageController.insertMany(data),
-                    status: 201,
-                }),
-            );
-        },
-    );
+        return c.json(
+            successResponse({
+                data: await productImageController.insertMany(data),
+                status: 201,
+            }),
+        );
+    },
+);

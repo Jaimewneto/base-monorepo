@@ -9,7 +9,7 @@ import type {
 
 export interface StockTable {
     id: Generated<string>;
-    company_id: string;
+    tenant_id: string;
     product_id: string;
     warehouse_id: string | null;
     amount: number;

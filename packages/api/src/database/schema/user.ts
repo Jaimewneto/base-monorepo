@@ -9,7 +9,7 @@ import type {
 
 export interface UserTable {
     id: Generated<string>;
-    company_id: string;
+    tenant_id: string;
     name: string;
     email: string;
     password: string;
@@ -22,4 +22,4 @@ export type User = Selectable<UserTable>;
 export type UserCreate = Insertable<UserTable>;
 export type UserUpdate = Updateable<UserTable>;
 
-export type UserCreateWithoutCompanyId = Omit<UserCreate, "company_id">;
+export type UserCreateWithoutTenantId = Omit<UserCreate, "tenant_id">;

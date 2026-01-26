@@ -9,9 +9,9 @@ export async function up(db: Kysely<Database>): Promise<void> {
             col.primaryKey().defaultTo(sql`uuidv7()`),
         )
         .addColumn(
-            "company_id",
+            "tenant_id",
             "uuid",
-            (col) => col.references("company.id").notNull(), // foreign key
+            (col) => col.references("tenant.id").notNull(), // foreign key
         )
         .addColumn("description", "varchar(255)", (col) => col.notNull())
         .addColumn("observations", "varchar(255)")

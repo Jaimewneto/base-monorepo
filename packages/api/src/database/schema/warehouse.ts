@@ -9,7 +9,7 @@ import type {
 
 export interface WarehouseTable {
     id: Generated<string>;
-    company_id: string;
+    tenant_id: string;
     description: string;
     observations: string | null;
     created_at: ColumnType<Date, string | undefined, never>;
@@ -21,7 +21,4 @@ export type Warehouse = Selectable<WarehouseTable>;
 export type WarehouseCreate = Insertable<WarehouseTable>;
 export type WarehouseUpdate = Updateable<WarehouseTable>;
 
-export type WarehouseCreateWithoutCompanyId = Omit<
-    WarehouseCreate,
-    "company_id"
->;
+export type WarehouseCreateWithoutTenantId = Omit<WarehouseCreate, "tenant_id">;

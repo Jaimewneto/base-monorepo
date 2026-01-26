@@ -1,7 +1,7 @@
 import z from "zod/v4";
 import { database } from "../../database/constSchema.js";
 import type {
-    WarehouseCreateWithoutCompanyId,
+    WarehouseCreateWithoutTenantId,
     WarehouseUpdate,
 } from "../../database/schema/warehouse.js";
 import type { CheckSchema } from "../../types/validation.js";
@@ -23,7 +23,7 @@ export const warehouseRequestsValidations = () => {
     const create = z.object({
         description: z.string().min(2).max(100),
         observations: z.string().min(2).max(100).nullable().optional(),
-    } satisfies CheckSchema<WarehouseCreateWithoutCompanyId>);
+    } satisfies CheckSchema<WarehouseCreateWithoutTenantId>);
 
     const updateById = z.object({
         description: z.string().min(2).max(100),

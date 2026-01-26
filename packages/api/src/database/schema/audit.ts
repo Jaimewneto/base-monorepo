@@ -9,7 +9,7 @@ import type {
 
 export interface AuditTable {
     id: Generated<string>;
-    company_id: string;
+    tenant_id: string;
     user_id: string;
     previous_value: string | null;
     new_value: string;

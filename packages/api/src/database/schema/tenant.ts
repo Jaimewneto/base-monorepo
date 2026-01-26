@@ -7,7 +7,7 @@ import type {
     Updateable,
 } from "kysely";
 
-export interface CompanyTable {
+export interface TenantTable {
     id: Generated<string>;
     name: string;
     //document: string;
@@ -16,6 +16,6 @@ export interface CompanyTable {
     deleted_at: ColumnType<Date, string | undefined, Date>;
 }
 
-export type Company = Selectable<CompanyTable>;
-export type CompanyCreate = Insertable<CompanyTable>;
-export type CompanyUpdate = Updateable<CompanyTable>;
+export type Tenant = Selectable<TenantTable>;
+export type TenantCreate = Insertable<TenantTable>;
+export type TenantUpdate = Updateable<TenantTable>;

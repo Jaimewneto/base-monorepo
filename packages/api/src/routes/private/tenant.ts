@@ -1,16 +1,16 @@
 import { Hono } from "hono";
 
-import { companyController } from "../../controllers/company.js";
+import { tenantController } from "../../controllers/tenant.js";
 import {
     paginatedResponse,
     successResponse,
 } from "../../utils/http-response.js";
 import { zodValidate } from "../../utils/zodValidator.js";
-import { companyRequestsValidations } from "../../validations/http-requests/company.js";
+import { tenantRequestsValidations } from "../../validations/http-requests/tenant.js";
 
-const validations = companyRequestsValidations();
+const validations = tenantRequestsValidations();
 
-export const companyRoutes = new Hono()
+export const tenantRoutes = new Hono()
     .get(
         "/:id",
         zodValidate({ target: "param", schema: validations.findOneById }),
@@ -19,7 +19,7 @@ export const companyRoutes = new Hono()
 
             return c.json(
                 successResponse({
-                    data: await companyController.findOneById(id),
+                    data: await tenantController.findOneById(id),
                 }),
             );
         },
@@ -30,7 +30,7 @@ export const companyRoutes = new Hono()
         async (c) => {
             const params = c.req.valid("json");
 
-            const { list, count } = await companyController.findMany(params);
+            const { list, count } = await tenantController.findMany(params);
 
             return c.json(
                 paginatedResponse({
@@ -53,7 +53,7 @@ export const companyRoutes = new Hono()
 
             return c.json(
                 successResponse({
-                    data: await companyController.updateById({ id, data }),
+                    data: await tenantController.updateById({ id, data }),
                 }),
             );
         },

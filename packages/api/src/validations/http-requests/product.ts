@@ -3,7 +3,7 @@ import z from "zod/v4";
 import { database } from "../../database/constSchema.js";
 
 import type {
-    ProductCreateWithoutCompanyId,
+    ProductCreateWithoutTenantId,
     ProductUpdate,
 } from "../../database/schema/product.js";
 
@@ -29,7 +29,7 @@ export const productRequestsValidations = () => {
         internal_code: z.string().min(2).max(100),
         sku: z.string().min(2).max(100),
         observations: z.string().min(2).max(100).nullable().optional(),
-    } satisfies CheckSchema<ProductCreateWithoutCompanyId>);
+    } satisfies CheckSchema<ProductCreateWithoutTenantId>);
 
     const updateById = z.object({
         description: z.string().min(2).max(100),
