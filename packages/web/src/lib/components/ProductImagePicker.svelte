@@ -89,7 +89,7 @@
   <!-- Botão adicionar -->
   <label class="aspect-square rounded-md border border-dashed flex items-center justify-center cursor-pointer hover:bg-muted">
     <Plus class="h-6 w-6 text-muted-foreground" />
-    <input type="file" accept="image/*" class="hidden" capture onchange={selectImage} />
+    <input type="file" accept="image/*" class="hidden" onchange={selectImage} />
   </label>
 </div>
 
