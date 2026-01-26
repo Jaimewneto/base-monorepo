@@ -1,6 +1,6 @@
 <script lang="ts">
   import ImageCropModal from "./ImageCropModal.svelte";
-  import { X, Plus, Star } from "@lucide/svelte";
+  import { X, Plus, Star, Camera } from "@lucide/svelte";
 
   export type ImageItem = { type: "url"; url: string; id: string; isMain?: boolean } | { type: "file"; file: File; isMain?: boolean };
 
@@ -72,13 +72,11 @@
     <div class="relative group aspect-square rounded-md border overflow-hidden">
       <img src={getSrc(image)} class="h-full w-full object-cover" alt="Imagem do produto" />
 
-      <!-- Remover -->
       <button type="button" class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition" onclick={() => removeImage(i)}>
         <X class="h-4 w-4 text-white drop-shadow" />
       </button>
 
       {#if enableMainImage}
-        <!-- Star -->
         <button type="button" class="absolute bottom-1 right-1 transition" onclick={() => setMainImage(i)}>
           <Star class={`h-4 w-4 drop-shadow ${image.isMain ? "text-yellow-400" : "text-white"}`} fill={image.isMain ? "currentColor" : "none"} />
         </button>
@@ -86,10 +84,16 @@
     </div>
   {/each}
 
-  <!-- Botão adicionar -->
-  <label class="aspect-square rounded-md border border-dashed flex items-center justify-center cursor-pointer hover:bg-muted">
+  <label class="aspect-square rounded-md border border-dashed flex items-center justify-center cursor-pointer hover:bg-muted transition-colors">
     <Plus class="h-6 w-6 text-muted-foreground" />
     <input type="file" accept="image/*" class="hidden" onchange={selectImage} />
+  </label>
+
+  <label
+    class="hidden max-md:flex aspect-square rounded-md border border-dashed items-center justify-center cursor-pointer hover:bg-muted transition-colors"
+  >
+    <Camera class="h-6 w-6 text-muted-foreground" />
+    <input type="file" accept="image/*" capture="environment" class="hidden" onchange={selectImage} />
   </label>
 </div>
 
