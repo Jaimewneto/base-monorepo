@@ -3,7 +3,7 @@ import { AsyncLocalStorage } from "node:async_hooks";
 export type RequestContext = {
     user?: {
         id: string;
-        company_id: string;
+        tenant_id: string;
         name: string;
     };
 };

@@ -9,7 +9,7 @@ import type {
 
 export interface ProductImageTable {
     id: Generated<string>;
-    company_id: string;
+    tenant_id: string;
     product_id: string;
     url: string;
     main: boolean;

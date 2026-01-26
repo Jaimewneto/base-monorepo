@@ -191,7 +191,7 @@
           .filter((img) => img.type === "url")
           .map((img) => ({
             id: img.id,
-            company_id: newProduct.company_id,
+            tenant_id: newProduct.tenant_id,
             product_id: newProduct.id,
             url: img.url,
             main: !!img.isMain,
@@ -199,7 +199,7 @@
 
         // imagens novas (upload)
         ...uploadedUrls.map((url, index) => ({
-          company_id: newProduct.company_id,
+          tenant_id: newProduct.tenant_id,
           product_id: newProduct.id,
           url,
 

@@ -2,30 +2,30 @@ import { hash } from "@node-rs/argon2";
 
 import { client } from "../database/client.js";
 
-import { companyRepository } from "../database/repositories/company.js";
+import { tenantRepository } from "../database/repositories/tenant.js";
 import { userRepository } from "../database/repositories/user.js";
 
-import type { CompanyCreate } from "../database/schema/company.js";
-import type { UserCreateWithoutCompanyId } from "../database/schema/user.js";
+import type { TenantCreate } from "../database/schema/tenant.js";
+import type { UserCreateWithoutTenantId } from "../database/schema/user.js";
 import { userRules } from "../rules/user.js";
 import { baseService } from "./baseService.js";
 
-const base = baseService<"company">(companyRepository(client));
+const base = baseService<"tenant">(tenantRepository(client));
 
-export const companyService = {
+export const tenantService = {
     ...base,
 
     createWithUser: async (data: {
-        company: CompanyCreate;
-        user: UserCreateWithoutCompanyId;
+        tenant: TenantCreate;
+        user: UserCreateWithoutTenantId;
     }) => {
         return await client.transaction().execute(async (trx) => {
-            const base = baseService<"company">(companyRepository(trx));
+            const base = baseService<"tenant">(tenantRepository(trx));
             const userRepositoryInstance = userRepository(trx);
 
             const { name, email, password } = data.user;
 
-            const company = await base.create(data.company);
+            const tenant = await base.create(data.tenant);
 
             const hashedPassword = await hash(password);
 
@@ -35,11 +35,11 @@ export const companyService = {
                 email,
                 password: hashedPassword,
                 name,
-                company_id: company.id,
+                tenant_id: tenant.id,
             });
 
             return {
-                company,
+                tenant,
                 user,
             };
         });

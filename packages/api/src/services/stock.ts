@@ -14,12 +14,12 @@ export const stockService = {
     ...base,
 
     createOrUpdate: async ({
-        company_id,
+        tenant_id,
         warehouse_id,
         product_id,
         amount,
     }: {
-        company_id: string;
+        tenant_id: string;
         warehouse_id: string;
         product_id: string;
         amount: number;
@@ -41,7 +41,7 @@ export const stockService = {
 
                 if (amountDifference > 0) {
                     await cardexRepo.create({
-                        company_id: existingStock.company_id,
+                        tenant_id: existingStock.tenant_id,
                         warehouse_id,
                         product_id,
                         description: "Alteração manual de estoque",
@@ -52,7 +52,7 @@ export const stockService = {
 
                 if (amountDifference < 0) {
                     await cardexRepo.create({
-                        company_id: existingStock.company_id,
+                        tenant_id: existingStock.tenant_id,
                         warehouse_id,
                         product_id,
                         description: "Alteração manual de estoque",
@@ -79,7 +79,7 @@ export const stockService = {
             }
 
             await cardexRepo.create({
-                company_id,
+                tenant_id,
                 warehouse_id,
                 product_id,
                 description: "Alteração manual de estoque",
@@ -88,7 +88,7 @@ export const stockService = {
             });
 
             return await stockRepo.create({
-                company_id,
+                tenant_id,
                 warehouse_id,
                 product_id,
                 amount,

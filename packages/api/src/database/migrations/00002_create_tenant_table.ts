@@ -4,7 +4,7 @@ import type { Database } from "../schema/index.js";
 
 export async function up(db: Kysely<Database>): Promise<void> {
     await db.schema
-        .createTable("company")
+        .createTable("tenant")
         .addColumn("id", "uuid", (col) =>
             col.primaryKey().defaultTo(sql`uuidv7()`),
         )
@@ -20,5 +20,5 @@ export async function up(db: Kysely<Database>): Promise<void> {
 }
 
 export async function down(db: Kysely<Database>): Promise<void> {
-    await db.schema.dropTable("company").execute();
+    await db.schema.dropTable("tenant").execute();
 }

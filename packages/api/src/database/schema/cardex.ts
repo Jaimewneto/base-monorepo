@@ -9,7 +9,7 @@ import type {
 
 export interface CardexTable {
     id: Generated<string>;
-    company_id: string;
+    tenant_id: string;
     product_id: string;
     warehouse_id: string;
     entry: number;
@@ -24,4 +24,4 @@ export type Cardex = Selectable<CardexTable>;
 export type CardexCreate = Insertable<CardexTable>;
 export type CardexUpdate = Updateable<CardexTable>;
 
-export type CardexCreateWithoutCompanyId = Omit<CardexCreate, "company_id">;
+export type CardexCreateWithoutTenantId = Omit<CardexCreate, "tenant_id">;

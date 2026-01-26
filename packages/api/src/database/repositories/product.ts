@@ -1,11 +1,11 @@
 import type { SqlBool } from "kysely";
 import { type ExpressionBuilder, type Selectable, sql } from "kysely";
 import { getCurrentRequestUser } from "../../request-context.js";
-import { hasCompanyIdColumn } from "../../utils/repository.js";
+import { hasTenantIdColumn } from "../../utils/repository.js";
 import { client } from "../client.js";
 import type { Database } from "../schema/index.js";
-import { baseRepository } from "./baseRepository.js";
 import type { ProductImage } from "../schema/productImage.js";
+import { baseRepository } from "./baseRepository.js";
 
 const tableName = "product" as const;
 
@@ -19,7 +19,7 @@ type WarehouseStock = {
 
 type SimplifiedImage = Pick<
     ProductImage,
-    "id" | "company_id" | "product_id" | "url" | "main"
+    "id" | "tenant_id" | "product_id" | "url" | "main"
 >;
 
 const base = (db = client) =>
@@ -85,11 +85,7 @@ export const productRepository = (db = client) => ({
                                 coalesce(sum(coalesce(s.amount, 0)), 0)
                             `.as("total_in_stocks"),
                         ])
-                        .whereRef(
-                            "w.company_id",
-                            "=",
-                            `${tableName}.company_id`,
-                        )
+                        .whereRef("w.tenant_id", "=", `${tableName}.tenant_id`)
                         .where("w.deleted_at", "is", null)
                         .as("warehouse_stocks"),
                 (join) => join.onTrue(),
@@ -104,7 +100,7 @@ export const productRepository = (db = client) => ({
                                     json_agg(
                                         json_build_object(
                                             'id', pi.id,
-                                            'company_id', pi.company_id,
+                                            'tenant_id', pi.tenant_id,
                                             'product_id', pi.product_id,
                                             'url', pi.url,
                                             'main', pi.main
@@ -114,11 +110,7 @@ export const productRepository = (db = client) => ({
                                 )
                             `.as("images"),
                         ])
-                        .whereRef(
-                            "pi.product_id",
-                            "=",
-                            `${tableName}.id`,
-                        )
+                        .whereRef("pi.product_id", "=", `${tableName}.id`)
                         .where("pi.deleted_at", "is", null)
                         .as("images"),
                 (join) => join.onTrue(),
@@ -131,9 +123,9 @@ export const productRepository = (db = client) => ({
                 sql<
                     WarehouseStock[]
                 >`coalesce(warehouse_stocks.stocks, '[]'::json)`.as("stocks"),
-                sql<
-                    SimplifiedImage[]
-                >`coalesce(images.images, '[]'::json)`.as("images"),
+                sql<SimplifiedImage[]>`coalesce(images.images, '[]'::json)`.as(
+                    "images",
+                ),
             ])
             .where(`${tableName}.deleted_at`, "is", null);
 
@@ -150,16 +142,16 @@ export const productRepository = (db = client) => ({
             }
         }
 
-        if (user && hasCompanyIdColumn(tableName)) {
+        if (user && hasTenantIdColumn(tableName)) {
             countQuery = countQuery.where(
-                `${tableName}.company_id`,
+                `${tableName}.tenant_id`,
                 "=",
-                user.company_id,
+                user.tenant_id,
             );
             listQuery = listQuery.where(
-                `${tableName}.company_id`,
+                `${tableName}.tenant_id`,
                 "=",
-                user.company_id,
+                user.tenant_id,
             );
         }
 

@@ -2,17 +2,17 @@ import type { Insertable, Selectable, Updateable } from "kysely";
 
 import type { AuditTable } from "./audit.js";
 import type { CardexTable } from "./cardex.js";
-import type { CompanyTable } from "./company.js";
 import type { ProductTable } from "./product.js";
 import type { ProductImageTable } from "./productImage.js";
 import type { StockTable } from "./stock.js";
+import type { TenantTable } from "./tenant.js";
 import type { UserTable } from "./user.js";
 import type { WarehouseTable } from "./warehouse.js";
 
 export interface Database {
     audit: AuditTable;
     cardex: CardexTable;
-    company: CompanyTable;
+    tenant: TenantTable;
     product: ProductTable;
     stock: StockTable;
     user: UserTable;

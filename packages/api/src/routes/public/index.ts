@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 
 import { authRoutes } from "./auth.js";
-import { companyRoutes } from "./company.js";
+import { tenantRoutes } from "./tenant.js";
 
 export const publicRoutes = new Hono()
-    .route("/company", companyRoutes)
+    .route("/tenant", tenantRoutes)
     .route("/auth", authRoutes);

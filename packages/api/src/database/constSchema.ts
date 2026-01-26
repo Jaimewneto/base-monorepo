@@ -1,9 +1,9 @@
 import type { AuditTable } from "./schema/audit.js";
 import type { CardexTable } from "./schema/cardex.js";
-import type { CompanyTable } from "./schema/company.js";
 import type { ProductTable } from "./schema/product.js";
 import type { ProductImageTable } from "./schema/productImage.js";
 import type { StockTable } from "./schema/stock.js";
+import type { TenantTable } from "./schema/tenant.js";
 import type { UserTable } from "./schema/user.js";
 import type { WarehouseTable } from "./schema/warehouse.js";
 
@@ -16,7 +16,7 @@ type AssertAllKeysPresent<T, K extends (keyof T)[]> = Exclude<
 
 export const auditTableKeys = [
     "id",
-    "company_id",
+    "tenant_id",
     "user_id",
     "previous_value",
     "new_value",
@@ -30,7 +30,7 @@ const _checkAuditKeys: AssertAllKeysPresent<AuditTable, typeof auditTableKeys> =
 
 export const cardexTableKeys = [
     "id",
-    "company_id",
+    "tenant_id",
     "product_id",
     "warehouse_id",
     "entry",
@@ -46,22 +46,22 @@ const _checkCardexKeys: AssertAllKeysPresent<
     typeof cardexTableKeys
 > = true;
 
-export const companyTableKeys = [
+export const tenantTableKeys = [
     "id",
     "name",
     "created_at",
     "updated_at",
     "deleted_at",
-] as const satisfies (keyof CompanyTable)[];
+] as const satisfies (keyof TenantTable)[];
 
-const _checkCompanyKeys: AssertAllKeysPresent<
-    CompanyTable,
-    typeof companyTableKeys
+const _checkTenantKeys: AssertAllKeysPresent<
+    TenantTable,
+    typeof tenantTableKeys
 > = true;
 
 export const productTableKeys = [
     "id",
-    "company_id",
+    "tenant_id",
     "internal_code",
     "description",
     "sku",
@@ -78,7 +78,7 @@ const _checkProductKeys: AssertAllKeysPresent<
 
 export const stockTableKeys = [
     "id",
-    "company_id",
+    "tenant_id",
     "product_id",
     "warehouse_id",
     "amount",
@@ -92,7 +92,7 @@ const _checkStockKeys: AssertAllKeysPresent<StockTable, typeof stockTableKeys> =
 
 export const userTableKeys = [
     "id",
-    "company_id",
+    "tenant_id",
     "name",
     "email",
     "password",
@@ -106,7 +106,7 @@ const _checkUserKeys: AssertAllKeysPresent<UserTable, typeof userTableKeys> =
 
 export const warehouseTableKeys = [
     "id",
-    "company_id",
+    "tenant_id",
     "description",
     "observations",
     "created_at",
@@ -121,7 +121,7 @@ const _checkWarehouseKeys: AssertAllKeysPresent<
 
 export const productImageTableKeys = [
     "id",
-    "company_id",
+    "tenant_id",
     "product_id",
     "url",
     "main",
@@ -144,9 +144,9 @@ export const database = {
         name: "cardex",
         keys: cardexTableKeys,
     },
-    companyTable: {
-        name: "company",
-        keys: companyTableKeys,
+    tenantTable: {
+        name: "tenant",
+        keys: tenantTableKeys,
     },
     productTable: {
         name: "product",

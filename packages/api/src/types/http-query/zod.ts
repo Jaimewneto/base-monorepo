@@ -26,17 +26,17 @@ export type CardexWhereSortZodValidation = z.infer<
 export type CardexWhereZodValidation = CardexWhereSortZodValidation["where"];
 export type CardexSortZodValidation = CardexWhereSortZodValidation["sort"];
 
-// Company
-const companyWhereSortSchema = queryRequestsValidations({
-    tableName: database.companyTable.name,
-    tableKeys: database.companyTable.keys,
+// Tenant
+const tenantWhereSortSchema = queryRequestsValidations({
+    tableName: database.tenantTable.name,
+    tableKeys: database.tenantTable.keys,
 }).WhereSortSchema;
 
-export type CompanyWhereSortZodValidation = z.infer<
-    typeof companyWhereSortSchema
+export type TenantWhereSortZodValidation = z.infer<
+    typeof tenantWhereSortSchema
 >;
-export type CompanyWhereZodValidation = CompanyWhereSortZodValidation["where"];
-export type CompanySortZodValidation = CompanyWhereSortZodValidation["sort"];
+export type TenantWhereZodValidation = TenantWhereSortZodValidation["where"];
+export type TenantSortZodValidation = TenantWhereSortZodValidation["sort"];
 
 // Product
 const productWhereSortSchema = queryRequestsValidations({
@@ -87,7 +87,7 @@ export type WarehouseSortZodValidation =
 export type ZodWhereMap = {
     audit: AuditWhereZodValidation;
     cardex: CardexWhereZodValidation;
-    company: CompanyWhereZodValidation;
+    tenant: TenantWhereZodValidation;
     product: ProductWhereZodValidation;
     stock: StockWhereZodValidation;
     user: UserWhereZodValidation;
@@ -97,7 +97,7 @@ export type ZodWhereMap = {
 export type ZodSortMap = {
     audit: AuditSortZodValidation;
     cardex: CardexSortZodValidation;
-    company: CompanySortZodValidation;
+    tenant: TenantSortZodValidation;
     product: ProductSortZodValidation;
     stock: StockSortZodValidation;
     user: UserSortZodValidation;

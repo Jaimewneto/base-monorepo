@@ -37,7 +37,7 @@ export const login = async ({
 
     const accessToken = await new jose.SignJWT({
         id: user.id,
-        company_id: user.company_id,
+        tenant_id: user.tenant_id,
         name: user.name,
     })
         .setProtectedHeader({ alg: "HS256" })
@@ -47,7 +47,7 @@ export const login = async ({
 
     const refreshToken = await new jose.SignJWT({
         id: user.id,
-        company_id: user.company_id,
+        tenant_id: user.tenant_id,
         name: user.name,
     })
         .setProtectedHeader({ alg: "HS256" })
@@ -98,7 +98,7 @@ export const refreshToken = async (token: string) => {
 
         const newAccessToken = await new jose.SignJWT({
             id: payload.id,
-            company_id: payload.company_id,
+            tenant_id: payload.tenant_id,
             name: payload.name,
         })
             .setProtectedHeader({ alg: "HS256" })
@@ -108,7 +108,7 @@ export const refreshToken = async (token: string) => {
 
         const newRefreshToken = await new jose.SignJWT({
             id: payload.id,
-            company_id: payload.company_id,
+            tenant_id: payload.tenant_id,
             name: payload.name,
         })
             .setProtectedHeader({ alg: "HS256" })

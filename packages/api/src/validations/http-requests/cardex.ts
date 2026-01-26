@@ -1,6 +1,6 @@
 import z from "zod/v4";
 import { database } from "../../database/constSchema.js";
-import type { CardexCreateWithoutCompanyId } from "../../database/schema/cardex.js";
+import type { CardexCreateWithoutTenantId } from "../../database/schema/cardex.js";
 import type { CheckSchema } from "../../types/validation.js";
 import { queryRequestsValidations } from "./query.js";
 
@@ -19,7 +19,7 @@ export const cardexRequestsValidations = () => {
         entry: z.number().min(0).default(0),
         exit: z.number().min(0).default(0),
         description: z.string().min(2).max(100),
-    } satisfies CheckSchema<CardexCreateWithoutCompanyId>);
+    } satisfies CheckSchema<CardexCreateWithoutTenantId>);
 
     return {
         findMany,

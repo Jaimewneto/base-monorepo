@@ -27,7 +27,7 @@ export const stockController = {
         }
 
         return await stockService.createOrUpdate({
-            company_id: user.company_id,
+            tenant_id: user.tenant_id,
             warehouse_id,
             product_id,
             amount,

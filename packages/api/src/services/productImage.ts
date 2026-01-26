@@ -66,8 +66,8 @@ export const productImageService = {
                             id: (item as ProductImage).id,
                             data: {
                                 main: item.main,
-                            }
-                        })
+                            },
+                        });
                     }
 
                     continue;

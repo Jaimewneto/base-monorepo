@@ -55,11 +55,11 @@ export const productRoutes = new Hono()
         async (c) => {
             const data = c.req.valid("json");
 
-            const { company_id } = c.get("user");
+            const { tenant_id } = c.get("user");
 
             const scopedData = {
                 ...data,
-                company_id,
+                tenant_id,
             };
 
             return c.json(

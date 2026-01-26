@@ -9,7 +9,7 @@ import { sql } from "kysely";
 
 import { getCurrentRequestUser } from "../../request-context.js";
 import type { BaseRepository } from "../../types/repository.js";
-import { hasCompanyIdColumn } from "../../utils/repository.js";
+import { hasTenantIdColumn } from "../../utils/repository.js";
 import { client } from "../client.js";
 import type { Database } from "../schema/index.js";
 
@@ -31,12 +31,8 @@ export const baseRepository = <K extends keyof Database>({
             // @ts-expect-error
             .where(`${tableName}.id`, "=", id);
 
-        if (user && hasCompanyIdColumn(tableName))
-            query = query.where(
-                `${tableName}.company_id`,
-                "=",
-                user.company_id,
-            );
+        if (user && hasTenantIdColumn(tableName))
+            query = query.where(`${tableName}.tenant_id`, "=", user.tenant_id);
 
         return await query.executeTakeFirst();
     };
@@ -52,12 +48,8 @@ export const baseRepository = <K extends keyof Database>({
             // @ts-expect-error
             .where(where);
 
-        if (user && hasCompanyIdColumn(tableName))
-            query = query.where(
-                `${tableName}.company_id`,
-                "=",
-                user.company_id,
-            );
+        if (user && hasTenantIdColumn(tableName))
+            query = query.where(`${tableName}.tenant_id`, "=", user.tenant_id);
 
         return await query.executeTakeFirst();
     };
@@ -103,16 +95,16 @@ export const baseRepository = <K extends keyof Database>({
             }
         }
 
-        if (user && hasCompanyIdColumn(tableName)) {
+        if (user && hasTenantIdColumn(tableName)) {
             countQuery = countQuery.where(
-                `${tableName}.company_id`,
+                `${tableName}.tenant_id`,
                 "=",
-                user.company_id,
+                user.tenant_id,
             );
             listQuery = listQuery.where(
-                `${tableName}.company_id`,
+                `${tableName}.tenant_id`,
                 "=",
-                user.company_id,
+                user.tenant_id,
             );
         }
 
@@ -134,12 +126,12 @@ export const baseRepository = <K extends keyof Database>({
 
         if (
             user &&
-            hasCompanyIdColumn(tableName) &&
+            hasTenantIdColumn(tableName) &&
             // @ts-expect-error
-            data?.company_id !== user.company_id
+            data?.tenant_id !== user.tenant_id
         ) {
             // @ts-expect-error
-            data.company_id = user.company_id;
+            data.tenant_id = user.tenant_id;
         }
 
         return await db
@@ -160,12 +152,12 @@ export const baseRepository = <K extends keyof Database>({
 
         if (
             user &&
-            hasCompanyIdColumn(tableName) &&
+            hasTenantIdColumn(tableName) &&
             // @ts-expect-error
-            data?.company_id !== user.company_id
+            data?.tenant_id !== user.tenant_id
         ) {
             // @ts-expect-error
-            data.company_id = user.company_id;
+            data.tenant_id = user.tenant_id;
         }
 
         let query = db
@@ -175,12 +167,8 @@ export const baseRepository = <K extends keyof Database>({
             .where(`${tableName}.id`, "=", id)
             .returningAll();
 
-        if (user && hasCompanyIdColumn(tableName))
-            query = query.where(
-                `${tableName}.company_id`,
-                "=",
-                user.company_id,
-            );
+        if (user && hasTenantIdColumn(tableName))
+            query = query.where(`${tableName}.tenant_id`, "=", user.tenant_id);
 
         return await query.executeTakeFirst();
     };
@@ -195,12 +183,8 @@ export const baseRepository = <K extends keyof Database>({
             .where(`${tableName}.id`, "=", id)
             .returningAll();
 
-        if (user && hasCompanyIdColumn(tableName))
-            query = query.where(
-                `${tableName}.company_id`,
-                "=",
-                user.company_id,
-            );
+        if (user && hasTenantIdColumn(tableName))
+            query = query.where(`${tableName}.tenant_id`, "=", user.tenant_id);
 
         return await query.executeTakeFirst();
     };

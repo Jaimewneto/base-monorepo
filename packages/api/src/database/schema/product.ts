@@ -9,7 +9,7 @@ import type {
 
 export interface ProductTable {
     id: Generated<string>;
-    company_id: string;
+    tenant_id: string;
     internal_code: string;
     description: string;
     sku: string;
@@ -23,4 +23,4 @@ export type Product = Selectable<ProductTable>;
 export type ProductCreate = Insertable<ProductTable>;
 export type ProductUpdate = Updateable<ProductTable>;
 
-export type ProductCreateWithoutCompanyId = Omit<ProductCreate, "company_id">;
+export type ProductCreateWithoutTenantId = Omit<ProductCreate, "tenant_id">;
