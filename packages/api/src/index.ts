@@ -6,8 +6,8 @@ import { env } from "./env.js";
 import { BadRequestError } from "./error.js";
 import { logger } from "./logger.js";
 import { routes } from "./routes/index.js";
-import { processUtils } from "./utils/process.js";
 import { getErrorMessage } from "./utils/messageTranslator.js";
+import { processUtils } from "./utils/process.js";
 
 const server = new Hono()
     .use(

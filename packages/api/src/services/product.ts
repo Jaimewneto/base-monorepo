@@ -14,7 +14,7 @@ const base = baseService<"product">(productRepository(client));
 export const productService = {
     ...base,
 
-    findManyWithStock: async ({
+    findManyWithStocksAndImage: async ({
         limit,
         page,
         where,
@@ -28,7 +28,33 @@ export const productService = {
             direction: "asc" | "desc";
         }[];
     }) => {
-        return await productRepository(client).findManyWithStock({
+        return await productRepository(client).findManyWithStocksAndImage({
+            limit,
+            page,
+            where,
+            orderBy,
+        });
+    },
+
+    findManyWithStocksAndImageByWarehouseId: async ({
+        warehouseId,
+        limit,
+        page,
+        where,
+        orderBy,
+    }: {
+        warehouseId: string;
+        limit: number;
+        page: number;
+        where?: (eb: ExpressionBuilder<Database, "product">) => SqlBool;
+        orderBy?: {
+            column: keyof Database["product"] & string;
+            direction: "asc" | "desc";
+        }[];
+    }) => {
+        return await productRepository(client).findManyWithStocksAndImageByWarehouseId
+        ({
+            warehouseId,
             limit,
             page,
             where,

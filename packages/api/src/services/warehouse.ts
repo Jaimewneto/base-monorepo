@@ -4,8 +4,8 @@ import { client } from "../database/client.js";
 import { stockRepository } from "../database/repositories/stock.js";
 import { warehouseRepository } from "../database/repositories/warehouse.js";
 import { BadRequestError } from "../error.js";
-import { baseService } from "./baseService.js";
 import { getErrorMessage } from "../utils/messageTranslator.js";
+import { baseService } from "./baseService.js";
 
 const base = baseService<"warehouse">(warehouseRepository(client));
 

@@ -31,7 +31,7 @@ const base = (db = client) =>
 export const productRepository = (db = client) => ({
     ...base(db),
 
-    findManyWithStock: async ({
+    findManyWithStocksAndImage: async ({
         page = 1,
         limit = 10,
         where,
@@ -157,6 +157,173 @@ export const productRepository = (db = client) => ({
 
         listQuery = listQuery.orderBy("id", "desc");
 
+        const { count } = await countQuery.executeTakeFirstOrThrow();
+        const list = await listQuery.limit(limit).offset(offset).execute();
+
+        return {
+            count: Number(count),
+            list,
+        };
+    },
+
+    findManyWithStocksAndImageByWarehouseId: async ({
+        warehouseId,
+        page = 1,
+        limit = 10,
+        where,
+        orderBy,
+    }: {
+        warehouseId: string;
+        page: number;
+        limit: number;
+        where?: (eb: ExpressionBuilder<Database, TableName>) => SqlBool;
+        orderBy?: {
+            column: keyof Database[TableName] & string;
+            direction: "asc" | "desc";
+        }[];
+    }) => {
+        const user = getCurrentRequestUser();
+        const offset = (page - 1) * limit;
+
+        /**
+         * 🔒 Filtro semântico:
+         * produto só entra se tiver estoque > 0
+         * no warehouse informado
+         */
+        const hasStockInWarehouse = (
+            eb: ExpressionBuilder<Database, TableName>,
+        ) =>
+            eb.exists(
+                eb
+                    .selectFrom("stock as s")
+                    .whereRef("s.product_id", "=", `${tableName}.id`)
+                    .where("s.warehouse_id", "=", warehouseId)
+                    .where("s.amount", ">", 0)
+                    .where("s.deleted_at", "is", null),
+            );
+
+        // ==========================
+        // COUNT QUERY
+        // ==========================
+        let countQuery = db
+            .selectFrom(tableName)
+            // @ts-expect-error
+            .select(sql`count(*) as count`)
+            .where(`${tableName}.deleted_at`, "is", null)
+            .where(hasStockInWarehouse);
+
+        // ==========================
+        // LIST QUERY
+        // ==========================
+        let listQuery = db
+            .selectFrom(tableName)
+            /**
+             * 📦 Estoque do warehouse específico
+             */
+            .leftJoinLateral(
+                (eb) =>
+                    eb
+                        .selectFrom("stock as s")
+                        .innerJoin("warehouse as w", "w.id", "s.warehouse_id")
+                        .select([
+                            sql`
+              json_build_object(
+                'warehouse_id', w.id,
+                'warehouse_description', w.description,
+                'amount', s.amount
+              )
+            `.as("stock"),
+                            sql<number>`s.amount::float8`.as("total_in_stocks"),
+                        ])
+                        .whereRef("s.product_id", "=", `${tableName}.id`)
+                        .where("s.warehouse_id", "=", warehouseId)
+                        .where("s.amount", ">", 0)
+                        .where("s.deleted_at", "is", null)
+                        .where("w.deleted_at", "is", null)
+                        .as("warehouse_stock"),
+                (join) => join.onTrue(),
+            )
+            /**
+             * 🖼️ Imagens do produto
+             */
+            .leftJoinLateral(
+                (eb) =>
+                    eb
+                        .selectFrom("product_image as pi")
+                        .select([
+                            sql`
+              coalesce(
+                json_agg(
+                  json_build_object(
+                    'id', pi.id,
+                    'tenant_id', pi.tenant_id,
+                    'product_id', pi.product_id,
+                    'url', pi.url,
+                    'main', pi.main
+                  )
+                ),
+                '[]'::json
+              )
+            `.as("images"),
+                        ])
+                        .whereRef("pi.product_id", "=", `${tableName}.id`)
+                        .where("pi.deleted_at", "is", null)
+                        .as("images"),
+                (join) => join.onTrue(),
+            )
+            .selectAll(tableName)
+            .select([
+                sql<number>`warehouse_stock.total_in_stocks`.as(
+                    "total_in_stocks",
+                ),
+                sql`warehouse_stock.stock`.as("stocks"),
+                sql<SimplifiedImage[]>`coalesce(images.images, '[]'::json)`.as(
+                    "images",
+                ),
+            ])
+            .where(`${tableName}.deleted_at`, "is", null)
+            .where(hasStockInWarehouse);
+
+        // ==========================
+        // WHERE dinâmico
+        // ==========================
+        if (where) {
+            // @ts-expect-error
+            countQuery = countQuery.where(where);
+            // @ts-expect-error
+            listQuery = listQuery.where(where);
+        }
+
+        // ==========================
+        // TENANT
+        // ==========================
+        if (user && hasTenantIdColumn(tableName)) {
+            countQuery = countQuery.where(
+                `${tableName}.tenant_id`,
+                "=",
+                user.tenant_id,
+            );
+            listQuery = listQuery.where(
+                `${tableName}.tenant_id`,
+                "=",
+                user.tenant_id,
+            );
+        }
+
+        // ==========================
+        // ORDER BY
+        // ==========================
+        if (orderBy) {
+            for (const sort of orderBy) {
+                listQuery = listQuery.orderBy(sort.column, sort.direction);
+            }
+        }
+
+        listQuery = listQuery.orderBy("id", "desc");
+
+        // ==========================
+        // EXECUÇÃO
+        // ==========================
         const { count } = await countQuery.executeTakeFirstOrThrow();
         const list = await listQuery.limit(limit).offset(offset).execute();
 
