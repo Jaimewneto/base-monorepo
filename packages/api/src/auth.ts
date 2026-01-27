@@ -9,6 +9,7 @@ import { BadRequestError } from "./error.js";
 import { userService } from "./services/user.js";
 
 import type { JWTPayload } from "./types/auth.js";
+import { getErrorMessage } from "./utils/messageTranslator.js";
 
 export const login = async ({
     email,
@@ -22,7 +23,9 @@ export const login = async ({
     if (!user)
         throw new BadRequestError({
             code: 401,
-            message: "Wrong email or password",
+            message: getErrorMessage({
+                key: "wrongEmailOrPassword",
+            }),
             name: "InvalidCredentialsError",
         });
 
@@ -31,7 +34,9 @@ export const login = async ({
     if (!isValid)
         throw new BadRequestError({
             code: 401,
-            message: "Wrong email or password",
+            message: getErrorMessage({
+                key: "wrongEmailOrPassword",
+            }),
             name: "InvalidCredentialsError",
         });
 
@@ -75,7 +80,9 @@ export const me = async (token: string) => {
         if (!user)
             throw new BadRequestError({
                 code: 404,
-                message: "User not found",
+                message: getErrorMessage({
+                    key: "notFound",
+                }),
                 name: "UserNotFoundError",
             });
 
@@ -83,7 +90,9 @@ export const me = async (token: string) => {
     } catch {
         throw new BadRequestError({
             code: 401,
-            message: "Invalid token",
+            message: getErrorMessage({
+                key: "invalidToken",
+            }),
             name: "InvalidTokenError",
         });
     }
@@ -126,7 +135,9 @@ export const refreshToken = async (token: string) => {
     } catch {
         throw new BadRequestError({
             code: 401,
-            message: "Invalid refresh token",
+            message: getErrorMessage({
+                key: "invalidToken",
+            }),
             name: "InvalidRefreshTokenError",
         });
     }

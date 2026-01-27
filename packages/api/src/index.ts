@@ -7,6 +7,7 @@ import { BadRequestError } from "./error.js";
 import { logger } from "./logger.js";
 import { routes } from "./routes/index.js";
 import { processUtils } from "./utils/process.js";
+import { getErrorMessage } from "./utils/messageTranslator.js";
 
 const server = new Hono()
     .use(
@@ -41,7 +42,9 @@ const server = new Hono()
             {
                 success: false,
                 error: {
-                    message: "Internal server error",
+                    message: getErrorMessage({
+                        key: "internalServerError",
+                    }),
                 },
             },
             500,

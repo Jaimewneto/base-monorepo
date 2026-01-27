@@ -1,7 +1,7 @@
-import z from "zod/v4";
 import { database } from "../../database/constSchema.js";
 import type { CardexCreateWithoutTenantId } from "../../database/schema/cardex.js";
 import type { CheckSchema } from "../../types/validation.js";
+import { zod as z } from "./index.js";
 import { queryRequestsValidations } from "./query.js";
 
 export const cardexRequestsValidations = () => {

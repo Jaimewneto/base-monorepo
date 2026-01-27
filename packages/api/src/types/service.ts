@@ -1,4 +1,3 @@
-// packages/api/src/types/service.ts
 import type {
     ExpressionBuilder,
     Insertable,

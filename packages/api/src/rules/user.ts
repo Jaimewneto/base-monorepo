@@ -3,7 +3,10 @@ import type { Kysely, SqlBool } from "kysely";
 import { userRepository } from "../database/repositories/user.js";
 
 import type { Database } from "../database/schema/index.js";
+
 import { BadRequestError } from "../error.js";
+
+import { getErrorMessage } from "../utils/messageTranslator.js";
 
 export const userRules = (db?: Kysely<Database>) => ({
     validateEmailUniqueness: async (email: string) => {
@@ -16,7 +19,7 @@ export const userRules = (db?: Kysely<Database>) => ({
 
         if (existingUser)
             throw new BadRequestError({
-                message: "Já existe um usuário com este e-mail",
+                message: getErrorMessage({ key: "userEmailAlreadyExists" }),
             });
     },
 });

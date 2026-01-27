@@ -1,7 +1,7 @@
-import type { SqlBool } from "kysely";
 import { BadRequestError } from "../error.js";
 import { getCurrentRequestUser } from "../request-context.js";
 import { stockService } from "../services/stock.js";
+import { getErrorMessage } from "../utils/messageTranslator.js";
 import { baseController } from "./baseController.js";
 
 export const base = baseController<"stock">(stockService);
@@ -22,7 +22,7 @@ export const stockController = {
 
         if (!user) {
             throw new BadRequestError({
-                message: "Usuário não autenticado",
+                message: getErrorMessage({ key: "unauthedUser" }),
             });
         }
 

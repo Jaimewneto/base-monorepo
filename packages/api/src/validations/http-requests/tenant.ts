@@ -1,10 +1,10 @@
-import z from "zod/v4";
 import { database } from "../../database/constSchema.js";
 import type {
     TenantCreate,
     TenantUpdate,
 } from "../../database/schema/tenant.js";
 import type { CheckSchema } from "../../types/validation.js";
+import { zod as z } from "./index.js";
 import { queryRequestsValidations } from "./query.js";
 import { userRequestsValidations } from "./user.js";
 

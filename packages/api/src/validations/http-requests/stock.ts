@@ -1,5 +1,5 @@
-import z from "zod/v4";
 import { database } from "../../database/constSchema.js";
+import { zod as z } from "./index.js";
 import { queryRequestsValidations } from "./query.js";
 
 export const stockRequestsValidations = () => {

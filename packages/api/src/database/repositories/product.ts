@@ -1,5 +1,5 @@
 import type { SqlBool } from "kysely";
-import { type ExpressionBuilder, type Selectable, sql } from "kysely";
+import { type ExpressionBuilder, sql } from "kysely";
 import { getCurrentRequestUser } from "../../request-context.js";
 import { hasTenantIdColumn } from "../../utils/repository.js";
 import { client } from "../client.js";

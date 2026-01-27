@@ -1,9 +1,9 @@
-import z from "zod/v4";
 import type {
     ProductImage,
     ProductImageCreate,
 } from "../../database/schema/productImage.js";
 import type { CheckSchema } from "../../types/validation.js";
+import { zod as z } from "./index.js";
 
 type CreateOrUpdateImages = ProductImageCreate | ProductImage;
 

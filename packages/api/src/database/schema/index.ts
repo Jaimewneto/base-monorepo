@@ -12,12 +12,12 @@ import type { WarehouseTable } from "./warehouse.js";
 export interface Database {
     audit: AuditTable;
     cardex: CardexTable;
-    tenant: TenantTable;
     product: ProductTable;
+    product_image: ProductImageTable;
     stock: StockTable;
+    tenant: TenantTable;
     user: UserTable;
     warehouse: WarehouseTable;
-    product_image: ProductImageTable;
 }
 
 export type Record<T extends keyof Database> = Selectable<Database[T]>;

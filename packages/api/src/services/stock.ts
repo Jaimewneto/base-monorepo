@@ -5,7 +5,7 @@ import { client } from "../database/client.js";
 import { cardexRepository } from "../database/repositories/cardex.js";
 import { stockRepository } from "../database/repositories/stock.js";
 import { BadRequestError } from "../error.js";
-import { getCurrentRequestUser } from "../request-context.js";
+import { getErrorMessage } from "../utils/messageTranslator.js";
 import { baseService } from "./baseService.js";
 
 const base = baseService<"stock">(stockRepository(client));
@@ -44,7 +44,7 @@ export const stockService = {
                         tenant_id: existingStock.tenant_id,
                         warehouse_id,
                         product_id,
-                        description: "Alteração manual de estoque",
+                        description: "Alteração manual de estoque", // TODO: Description by language
                         entry: amountDifference,
                         exit: 0,
                     });
@@ -55,7 +55,7 @@ export const stockService = {
                         tenant_id: existingStock.tenant_id,
                         warehouse_id,
                         product_id,
-                        description: "Alteração manual de estoque",
+                        description: "Alteração manual de estoque", // TODO: Description by language
                         entry: 0,
                         exit: Math.abs(amountDifference),
                     });
@@ -73,8 +73,9 @@ export const stockService = {
 
             if (amount === 0) {
                 throw new BadRequestError({
-                    message:
-                        "Não é possível criar um estoque com quantidade zero",
+                    message: getErrorMessage({
+                        key: "cannotCreateStockWithZeroAmount",
+                    }),
                 });
             }
 
@@ -82,7 +83,7 @@ export const stockService = {
                 tenant_id,
                 warehouse_id,
                 product_id,
-                description: "Alteração manual de estoque",
+                description: "Alteração manual de estoque", // TODO: Description by language
                 entry: amount,
                 exit: 0,
             });

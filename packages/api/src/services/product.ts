@@ -6,6 +6,7 @@ import { productRepository } from "../database/repositories/product.js";
 import { stockRepository } from "../database/repositories/stock.js";
 import type { Database } from "../database/schema/index.js";
 import { BadRequestError } from "../error.js";
+import { getErrorMessage } from "../utils/messageTranslator.js";
 import { baseService } from "./baseService.js";
 
 const base = baseService<"product">(productRepository(client));
@@ -52,8 +53,9 @@ export const productService = {
 
             if (stocks.count > 0) {
                 throw new BadRequestError({
-                    message:
-                        "Não é possível excluir um produto com itens com quantidade maior que zero",
+                    message: getErrorMessage({
+                        key: "cannotDeleteProductWithExistingStock",
+                    }),
                 });
             }
 

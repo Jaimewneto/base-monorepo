@@ -1,5 +1,5 @@
-import { z } from "zod/v4";
 import type { Database } from "../../database/schema/index.js";
+import { zod as z } from "./index.js";
 
 export const queryRequestsValidations = <K extends keyof Database>({
     tableName,

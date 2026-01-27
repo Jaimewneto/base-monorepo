@@ -5,6 +5,7 @@ import { stockRepository } from "../database/repositories/stock.js";
 import { warehouseRepository } from "../database/repositories/warehouse.js";
 import { BadRequestError } from "../error.js";
 import { baseService } from "./baseService.js";
+import { getErrorMessage } from "../utils/messageTranslator.js";
 
 const base = baseService<"warehouse">(warehouseRepository(client));
 
@@ -28,8 +29,9 @@ export const warehouseService = {
 
             if (stocks.count > 0) {
                 throw new BadRequestError({
-                    message:
-                        "Não é possível excluir um estoque com itens com quantidade maior que zero",
+                    message: getErrorMessage({
+                        key: "cannotDeleteWarehouseWithExistingStock",
+                    }),
                 });
             }
 

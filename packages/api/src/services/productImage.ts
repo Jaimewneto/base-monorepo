@@ -7,6 +7,7 @@ import type {
     ProductImageCreate,
 } from "../database/schema/productImage.js";
 import { BadRequestError } from "../error.js";
+import { getErrorMessage } from "../utils/messageTranslator.js";
 import { baseService } from "./baseService.js";
 
 const base = baseService<"product_image">(productImageRepository(client));
@@ -19,8 +20,9 @@ export const productImageService = {
     insertMany: async (data: CreateOrUpdateImages) => {
         if (data.length > 10) {
             throw new BadRequestError({
-                message:
-                    "Não é possível adicionar mais de 10 imagens por produto",
+                message: getErrorMessage({
+                    key: "cannotUploadMoreThanTenImages",
+                }),
             });
         }
 
@@ -28,7 +30,9 @@ export const productImageService = {
 
         if (mainImages.length > 1) {
             throw new BadRequestError({
-                message: "Somente uma imagem principal por produto",
+                message: getErrorMessage({
+                    key: "oneMainImageOnly",
+                }),
             });
         }
 
@@ -44,8 +48,6 @@ export const productImageService = {
                         eb("product_image.deleted_at", "is", null),
                     ]) as unknown as SqlBool,
             });
-
-            // Verificamos se alguma das "existingImages" não veio na array pra excluí-la
 
             for (const item of existingImages) {
                 const exists = data.find((img) => img.id === item.id);

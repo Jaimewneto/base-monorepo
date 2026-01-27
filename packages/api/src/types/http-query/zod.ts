@@ -50,6 +50,20 @@ export type ProductWhereSortZodValidation = z.infer<
 export type ProductWhereZodValidation = ProductWhereSortZodValidation["where"];
 export type ProductSortZodValidation = ProductWhereSortZodValidation["sort"];
 
+// Product image
+const productImageWhereSortSchema = queryRequestsValidations({
+    tableName: database.productImageTable.name,
+    tableKeys: database.productImageTable.keys,
+}).WhereSortSchema;
+
+export type ProductImageWhereSortZodValidation = z.infer<
+    typeof productImageWhereSortSchema
+>;
+export type ProductImageWhereZodValidation =
+    ProductImageWhereSortZodValidation["where"];
+export type ProductImageSortZodValidation =
+    ProductImageWhereSortZodValidation["sort"];
+
 // Stock
 const stockWhereSortSchema = queryRequestsValidations({
     tableName: database.stockTable.name,
@@ -87,9 +101,10 @@ export type WarehouseSortZodValidation =
 export type ZodWhereMap = {
     audit: AuditWhereZodValidation;
     cardex: CardexWhereZodValidation;
-    tenant: TenantWhereZodValidation;
     product: ProductWhereZodValidation;
+    product_image: ProductImageWhereZodValidation;
     stock: StockWhereZodValidation;
+    tenant: TenantWhereZodValidation;
     user: UserWhereZodValidation;
     warehouse: WarehouseWhereZodValidation;
 };
@@ -97,9 +112,10 @@ export type ZodWhereMap = {
 export type ZodSortMap = {
     audit: AuditSortZodValidation;
     cardex: CardexSortZodValidation;
-    tenant: TenantSortZodValidation;
     product: ProductSortZodValidation;
+    product_image: ProductImageSortZodValidation;
     stock: StockSortZodValidation;
+    tenant: TenantSortZodValidation;
     user: UserSortZodValidation;
     warehouse: WarehouseSortZodValidation;
 };

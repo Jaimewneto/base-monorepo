@@ -1,4 +1,4 @@
-import z from "zod/v4";
+import { zod as z } from "./index.js";
 
 export const authRequestsValidations = () => {
     const me = z.object({

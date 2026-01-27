@@ -8,7 +8,6 @@ import postgres from "postgres";
 import { env } from "../../env.js";
 import type { Database } from "../schema/index.js";
 
-// Simula o __dirname em ESM
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -31,7 +30,6 @@ async function migrateToLatest() {
         provider: new FileMigrationProvider({
             fs,
             path,
-            // Ajustado para apontar para a pasta correta saindo de scripts/
             migrationFolder: path.resolve(__dirname, "../migrations"),
         }),
     });
