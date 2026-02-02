@@ -276,7 +276,7 @@ export const productRepository = (db = client) => ({
                 sql<number>`warehouse_stock.total_in_stocks`.as(
                     "total_in_stocks",
                 ),
-                sql`warehouse_stock.stock`.as("stocks"),
+                sql<WarehouseStock[]>`warehouse_stock.stock`.as("stocks"),
                 sql<SimplifiedImage[]>`coalesce(images.images, '[]'::json)`.as(
                     "images",
                 ),
