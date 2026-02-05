@@ -11,7 +11,7 @@ const tableName = "product" as const;
 
 type TableName = typeof tableName;
 
-type WarehouseStock = {
+type WarehouseInventory = {
     warehouse_id: string;
     warehouse_description: string;
     amount: number;
@@ -31,7 +31,7 @@ const base = (db = client) =>
 export const productRepository = (db = client) => ({
     ...base(db),
 
-    findManyWithStocksAndImage: async ({
+    findManyWithInventoriesAndImage: async ({
         page = 1,
         limit = 10,
         where,
@@ -61,7 +61,7 @@ export const productRepository = (db = client) => ({
                 (eb) =>
                     eb
                         .selectFrom("warehouse as w")
-                        .leftJoin("stock as s", (join) =>
+                        .leftJoin("inventory as s", (join) =>
                             join
                                 .onRef("s.warehouse_id", "=", "w.id")
                                 .onRef("s.product_id", "=", `${tableName}.id`)
@@ -80,14 +80,14 @@ export const productRepository = (db = client) => ({
                                     ),
                                     '[]'::json
                                 )
-                            `.as("stocks"),
+                            `.as("inventories"),
                             sql`
                                 coalesce(sum(coalesce(s.amount, 0)), 0)
-                            `.as("total_in_stocks"),
+                            `.as("total_in_inventories"),
                         ])
                         .whereRef("w.tenant_id", "=", `${tableName}.tenant_id`)
                         .where("w.deleted_at", "is", null)
-                        .as("warehouse_stocks"),
+                        .as("warehouse_inventories"),
                 (join) => join.onTrue(),
             )
             .leftJoinLateral(
@@ -117,12 +117,14 @@ export const productRepository = (db = client) => ({
             )
             .selectAll(tableName)
             .select([
-                sql<number>`coalesce(warehouse_stocks.total_in_stocks, 0)::float8`.as(
-                    "total_in_stocks",
+                sql<number>`coalesce(warehouse_inventories.total_in_inventories, 0)::float8`.as(
+                    "total_in_inventories",
                 ),
                 sql<
-                    WarehouseStock[]
-                >`coalesce(warehouse_stocks.stocks, '[]'::json)`.as("stocks"),
+                    WarehouseInventory[]
+                >`coalesce(warehouse_inventories.inventories, '[]'::json)`.as(
+                    "inventories",
+                ),
                 sql<SimplifiedImage[]>`coalesce(images.images, '[]'::json)`.as(
                     "images",
                 ),
@@ -166,7 +168,7 @@ export const productRepository = (db = client) => ({
         };
     },
 
-    findManyWithStocksAndImageByWarehouseId: async ({
+    findManyWithInventoriesAndImageByWarehouseId: async ({
         warehouseId,
         page = 1,
         limit = 10,
@@ -190,12 +192,12 @@ export const productRepository = (db = client) => ({
          * produto só entra se tiver estoque > 0
          * no warehouse informado
          */
-        const hasStockInWarehouse = (
+        const hasInventoryInWarehouse = (
             eb: ExpressionBuilder<Database, TableName>,
         ) =>
             eb.exists(
                 eb
-                    .selectFrom("stock as s")
+                    .selectFrom("inventory as s")
                     .whereRef("s.product_id", "=", `${tableName}.id`)
                     .where("s.warehouse_id", "=", warehouseId)
                     .where("s.amount", ">", 0)
@@ -210,7 +212,7 @@ export const productRepository = (db = client) => ({
             // @ts-expect-error
             .select(sql`count(*) as count`)
             .where(`${tableName}.deleted_at`, "is", null)
-            .where(hasStockInWarehouse);
+            .where(hasInventoryInWarehouse);
 
         // ==========================
         // LIST QUERY
@@ -223,7 +225,7 @@ export const productRepository = (db = client) => ({
             .leftJoinLateral(
                 (eb) =>
                     eb
-                        .selectFrom("stock as s")
+                        .selectFrom("inventory as s")
                         .innerJoin("warehouse as w", "w.id", "s.warehouse_id")
                         .select([
                             sql`
@@ -232,15 +234,17 @@ export const productRepository = (db = client) => ({
                 'warehouse_description', w.description,
                 'amount', s.amount
               )
-            `.as("stock"),
-                            sql<number>`s.amount::float8`.as("total_in_stocks"),
+            `.as("inventory"),
+                            sql<number>`s.amount::float8`.as(
+                                "total_in_inventories",
+                            ),
                         ])
                         .whereRef("s.product_id", "=", `${tableName}.id`)
                         .where("s.warehouse_id", "=", warehouseId)
                         .where("s.amount", ">", 0)
                         .where("s.deleted_at", "is", null)
                         .where("w.deleted_at", "is", null)
-                        .as("warehouse_stock"),
+                        .as("warehouse_inventory"),
                 (join) => join.onTrue(),
             )
             /**
@@ -273,16 +277,18 @@ export const productRepository = (db = client) => ({
             )
             .selectAll(tableName)
             .select([
-                sql<number>`warehouse_stock.total_in_stocks`.as(
-                    "total_in_stocks",
+                sql<number>`warehouse_inventory.total_in_inventories`.as(
+                    "total_in_inventories",
                 ),
-                sql<WarehouseStock[]>`warehouse_stock.stock`.as("stocks"),
+                sql<WarehouseInventory[]>`warehouse_inventory.inventory`.as(
+                    "inventories",
+                ),
                 sql<SimplifiedImage[]>`coalesce(images.images, '[]'::json)`.as(
                     "images",
                 ),
             ])
             .where(`${tableName}.deleted_at`, "is", null)
-            .where(hasStockInWarehouse);
+            .where(hasInventoryInWarehouse);
 
         // ==========================
         // WHERE dinâmico

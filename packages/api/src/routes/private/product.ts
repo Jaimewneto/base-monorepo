@@ -33,7 +33,7 @@ export const productRoutes = new Hono()
             const { limit, page, where, sort } = c.req.valid("json");
 
             const { list, count } =
-                await productController.findManyWithStocksAndImage({
+                await productController.findManyWithInventoriesAndImage({
                     limit,
                     page,
                     where,

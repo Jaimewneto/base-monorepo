@@ -1,7 +1,7 @@
 import type { SqlBool } from "kysely";
 import { client } from "../database/client.js";
 
-import { stockRepository } from "../database/repositories/stock.js";
+import { inventoryRepository } from "../database/repositories/inventory.js";
 import { warehouseRepository } from "../database/repositories/warehouse.js";
 import { BadRequestError } from "../error.js";
 import { getErrorMessage } from "../utils/messageTranslator.js";
@@ -15,22 +15,22 @@ export const warehouseService = {
     deleteById: async (id: string) => {
         return await client.transaction().execute(async (trx) => {
             const base = baseService<"warehouse">(warehouseRepository(trx));
-            const stockRepositoryInstance = stockRepository(trx);
+            const inventoryRepositoryInstance = inventoryRepository(trx);
 
-            const stocks = await stockRepositoryInstance.findMany({
+            const inventorys = await inventoryRepositoryInstance.findMany({
                 page: 1,
                 limit: 1,
                 where: (eb) =>
                     eb.and([
-                        eb("stock.warehouse_id", "=", id),
-                        eb("stock.amount", ">", 0),
+                        eb("inventory.warehouse_id", "=", id),
+                        eb("inventory.amount", ">", 0),
                     ]) as unknown as SqlBool,
             });
 
-            if (stocks.count > 0) {
+            if (inventorys.count > 0) {
                 throw new BadRequestError({
                     message: getErrorMessage({
-                        key: "cannotDeleteWarehouseWithExistingStock",
+                        key: "cannotDeleteWarehouseWithExistingInventory",
                     }),
                 });
             }

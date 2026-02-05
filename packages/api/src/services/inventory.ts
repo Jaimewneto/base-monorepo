@@ -1,16 +1,15 @@
 import type { SqlBool } from "kysely";
 
 import { client } from "../database/client.js";
-
+import { inventoryRepository } from "../database/repositories/inventory.js";
 import { inventoryMovementRepository } from "../database/repositories/inventoryMovement.js";
-import { stockRepository } from "../database/repositories/stock.js";
 import { BadRequestError } from "../error.js";
 import { getErrorMessage } from "../utils/messageTranslator.js";
 import { baseService } from "./baseService.js";
 
-const base = baseService<"stock">(stockRepository(client));
+const base = baseService<"inventory">(inventoryRepository(client));
 
-export const stockService = {
+export const inventoryService = {
     ...base,
 
     createOrUpdate: async ({
@@ -25,23 +24,23 @@ export const stockService = {
         amount: number;
     }) => {
         return await client.transaction().execute(async (trx) => {
-            const stockRepo = stockRepository(trx);
+            const inventoryRepo = inventoryRepository(trx);
             const inventoryMovementRepo = inventoryMovementRepository(trx);
 
-            const existingStock = await stockRepo.findOneByCondition(
+            const existingInventory = await inventoryRepo.findOneByCondition(
                 (eb) =>
                     eb.and([
-                        eb("stock.warehouse_id", "=", warehouse_id),
-                        eb("stock.product_id", "=", product_id),
+                        eb("inventory.warehouse_id", "=", warehouse_id),
+                        eb("inventory.product_id", "=", product_id),
                     ]) as unknown as SqlBool,
             );
 
-            if (existingStock) {
-                const amountDifference = amount - existingStock.amount;
+            if (existingInventory) {
+                const amountDifference = amount - existingInventory.amount;
 
                 if (amountDifference > 0) {
                     await inventoryMovementRepo.create({
-                        tenant_id: existingStock.tenant_id,
+                        tenant_id: existingInventory.tenant_id,
                         warehouse_id,
                         product_id,
                         description: "Alteração manual de estoque", // TODO: Description by language
@@ -52,7 +51,7 @@ export const stockService = {
 
                 if (amountDifference < 0) {
                     await inventoryMovementRepo.create({
-                        tenant_id: existingStock.tenant_id,
+                        tenant_id: existingInventory.tenant_id,
                         warehouse_id,
                         product_id,
                         description: "Alteração manual de estoque", // TODO: Description by language
@@ -62,11 +61,11 @@ export const stockService = {
                 }
 
                 if (amountDifference === 0) {
-                    return existingStock;
+                    return existingInventory;
                 }
 
-                return await stockRepo.updateById({
-                    id: existingStock.id,
+                return await inventoryRepo.updateById({
+                    id: existingInventory.id,
                     data: { amount },
                 });
             }
@@ -74,7 +73,7 @@ export const stockService = {
             if (amount === 0) {
                 throw new BadRequestError({
                     message: getErrorMessage({
-                        key: "cannotCreateStockWithZeroAmount",
+                        key: "cannotCreateInventoryWithZeroAmount",
                     }),
                 });
             }
@@ -88,7 +87,7 @@ export const stockService = {
                 exit: 0,
             });
 
-            return await stockRepo.create({
+            return await inventoryRepo.create({
                 tenant_id,
                 warehouse_id,
                 product_id,

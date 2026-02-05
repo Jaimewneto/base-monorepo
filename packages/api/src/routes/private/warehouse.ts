@@ -55,7 +55,7 @@ export const warehouseRoutes = new Hono()
             const { limit, page, where, sort } = c.req.valid("json");
 
             const { list, count } =
-                await productController.findManyWithStocksAndImageByWarehouseId(
+                await productController.findManyWithInventoriesAndImageByWarehouseId(
                     {
                         warehouseId,
                         limit,

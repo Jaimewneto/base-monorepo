@@ -15,7 +15,7 @@ export const base = baseController<"product">(productService);
 export const productController = {
     ...base,
 
-    findManyWithStocksAndImage: async ({
+    findManyWithInventoriesAndImage: async ({
         limit,
         page,
         where,
@@ -35,7 +35,7 @@ export const productController = {
             sort as OrderBy<Database["product"], "product">[],
         );
 
-        return await productService.findManyWithStocksAndImage({
+        return await productService.findManyWithInventoriesAndImage({
             limit,
             page,
             where: finalWhere
@@ -45,7 +45,7 @@ export const productController = {
         });
     },
 
-    findManyWithStocksAndImageByWarehouseId: async ({
+    findManyWithInventoriesAndImageByWarehouseId: async ({
         warehouseId,
         limit,
         page,
@@ -67,14 +67,16 @@ export const productController = {
             sort as OrderBy<Database["product"], "product">[],
         );
 
-        return await productService.findManyWithStocksAndImageByWarehouseId({
-            warehouseId,
-            limit,
-            page,
-            where: finalWhere
-                ? (eb) => finalWhere(eb) as unknown as SqlBool
-                : undefined,
-            orderBy,
-        });
+        return await productService.findManyWithInventoriesAndImageByWarehouseId(
+            {
+                warehouseId,
+                limit,
+                page,
+                where: finalWhere
+                    ? (eb) => finalWhere(eb) as unknown as SqlBool
+                    : undefined,
+                orderBy,
+            },
+        );
     },
 };

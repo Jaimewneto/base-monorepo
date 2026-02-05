@@ -1,8 +1,8 @@
 import type { AuditTable } from "./schema/audit.js";
+import type { InventoryTable } from "./schema/inventory.js";
 import type { InventoryMovementTable } from "./schema/inventoryMovement.js";
 import type { ProductTable } from "./schema/product.js";
 import type { ProductImageTable } from "./schema/productImage.js";
-import type { StockTable } from "./schema/stock.js";
 import type { TenantTable } from "./schema/tenant.js";
 import type { UserTable } from "./schema/user.js";
 import type { WarehouseTable } from "./schema/warehouse.js";
@@ -80,7 +80,7 @@ const _checkProductKeys: AssertAllKeysPresent<
     typeof productTableKeys
 > = true;
 
-export const stockTableKeys = [
+export const inventoryTableKeys = [
     "id",
     "tenant_id",
     "product_id",
@@ -89,10 +89,12 @@ export const stockTableKeys = [
     "created_at",
     "updated_at",
     "deleted_at",
-] as const satisfies (keyof StockTable)[];
+] as const satisfies (keyof InventoryTable)[];
 
-const _checkStockKeys: AssertAllKeysPresent<StockTable, typeof stockTableKeys> =
-    true;
+const _checkInventoryKeys: AssertAllKeysPresent<
+    InventoryTable,
+    typeof inventoryTableKeys
+> = true;
 
 export const userTableKeys = [
     "id",
@@ -156,9 +158,9 @@ export const database = {
         name: "product",
         keys: productTableKeys,
     },
-    stockTable: {
-        name: "stock",
-        keys: stockTableKeys,
+    inventoryTable: {
+        name: "inventory",
+        keys: inventoryTableKeys,
     },
     userTable: {
         name: "user",

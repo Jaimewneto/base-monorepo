@@ -2,14 +2,14 @@ import { database } from "../../database/constSchema.js";
 import { zod as z } from "./index.js";
 import { queryRequestsValidations } from "./query.js";
 
-export const stockRequestsValidations = () => {
+export const inventoryRequestsValidations = () => {
     const findOneById = z.object({
         id: z.uuid(),
     });
 
     const findMany = queryRequestsValidations({
-        tableName: database.stockTable.name,
-        tableKeys: database.stockTable.keys,
+        tableName: database.inventoryTable.name,
+        tableKeys: database.inventoryTable.keys,
     }).WhereSortSchema.extend({
         limit: z.number().int().default(10),
         page: z.number().int().default(1),

@@ -59,9 +59,9 @@ export const errorMessages = {
         en: "Email already exists",
     },
     // PRODUCT
-    cannotDeleteProductWithExistingStock: {
+    cannotDeleteProductWithExistingInventory: {
         pt: "Não é possível excluir um produto com estoque maior que zero",
-        en: "Cannot delete product with existing stock greater than zero",
+        en: "Cannot delete product with existing inventory greater than zero",
     },
     cannotUploadMoreThanTenImages: {
         pt: "Não é possível enviar mais de dez imagens",
@@ -84,13 +84,13 @@ export const errorMessages = {
         en: "Barcode already exists",
     },
     // STOCK
-    cannotCreateStockWithZeroAmount: {
+    cannotCreateInventoryWithZeroAmount: {
         pt: "Não é possível criar um estoque com quantidade zero",
-        en: "Cannot create stock with zero amount",
+        en: "Cannot create inventory with zero amount",
     },
     // WAREHOUSE
-    cannotDeleteWarehouseWithExistingStock: {
+    cannotDeleteWarehouseWithExistingInventory: {
         pt: "Não é possível excluir um estoque com quantidade maior que zero",
-        en: "Cannot delete warehouse with existing stock greater than zero",
+        en: "Cannot delete warehouse with existing inventory greater than zero",
     },
 } as const;

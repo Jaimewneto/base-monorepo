@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 
-import { stockController } from "../../controllers/stock.js";
+import { inventoryController } from "../../controllers/inventory.js";
 
 import {
     paginatedResponse,
@@ -9,11 +9,11 @@ import {
 
 import { zodValidate } from "../../utils/zodValidator.js";
 
-import { stockRequestsValidations } from "../../validations/http-requests/stock.js";
+import { inventoryRequestsValidations } from "../../validations/http-requests/inventory.js";
 
-const validations = stockRequestsValidations();
+const validations = inventoryRequestsValidations();
 
-export const stockRoutes = new Hono()
+export const inventoryRoutes = new Hono()
     .get(
         "/:id",
         zodValidate({ target: "param", schema: validations.findOneById }),
@@ -22,7 +22,7 @@ export const stockRoutes = new Hono()
 
             return c.json(
                 successResponse({
-                    data: await stockController.findOneById(id),
+                    data: await inventoryController.findOneById(id),
                 }),
             );
         },
@@ -33,7 +33,7 @@ export const stockRoutes = new Hono()
         async (c) => {
             const params = c.req.valid("json");
 
-            const { list, count } = await stockController.findMany(params);
+            const { list, count } = await inventoryController.findMany(params);
 
             return c.json(
                 paginatedResponse({
@@ -53,7 +53,7 @@ export const stockRoutes = new Hono()
 
             return c.json(
                 successResponse({
-                    data: await stockController.createOrUpdate(params),
+                    data: await inventoryController.createOrUpdate(params),
                 }),
             );
         },

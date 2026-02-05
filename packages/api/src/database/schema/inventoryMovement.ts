@@ -24,4 +24,7 @@ export type InventoryMovement = Selectable<InventoryMovementTable>;
 export type InventoryMovementCreate = Insertable<InventoryMovementTable>;
 export type InventoryMovementUpdate = Updateable<InventoryMovementTable>;
 
-export type InventoryMovementCreateWithoutTenantId = Omit<InventoryMovementCreate, "tenant_id">;
+export type InventoryMovementCreateWithoutTenantId = Omit<
+    InventoryMovementCreate,
+    "tenant_id"
+>;

@@ -7,7 +7,7 @@ import type {
     Updateable,
 } from "kysely";
 
-export interface StockTable {
+export interface InventoryTable {
     id: Generated<string>;
     tenant_id: string;
     product_id: string;
@@ -18,6 +18,6 @@ export interface StockTable {
     deleted_at: ColumnType<Date, string | undefined, Date>;
 }
 
-export type Stock = Selectable<StockTable>;
-export type StockCreate = Insertable<StockTable>;
-export type StockUpdate = Updateable<StockTable>;
+export type Inventory = Selectable<InventoryTable>;
+export type InventoryCreate = Insertable<InventoryTable>;
+export type InventoryUpdate = Updateable<InventoryTable>;
