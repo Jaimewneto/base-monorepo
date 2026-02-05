@@ -15,3 +15,12 @@ export type WithoutChildrenOrChild<T> = WithoutChildren<WithoutChild<T>>;
 export type WithElementRef<T, U extends HTMLElement = HTMLElement> = T & {
     ref?: U | null;
 };
+
+export const numericToBrazilianCurrency = ({ value, decimals = 2 }: { value: number; decimals?: number }) => {
+    let numericValue = Number(value);
+
+    return numericValue.toLocaleString('pt-BR', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+    });
+}

@@ -1,7 +1,6 @@
 import { Hono } from "hono";
-
-import { warehouseController } from "../../controllers/warehouse.js";
 import { productController } from "../../controllers/product.js";
+import { warehouseController } from "../../controllers/warehouse.js";
 
 import {
     paginatedResponse,
@@ -9,9 +8,8 @@ import {
 } from "../../utils/http-response.js";
 
 import { zodValidate } from "../../utils/zodValidator.js";
-
-import { warehouseRequestsValidations } from "../../validations/http-requests/warehouse.js";
 import { productRequestsValidations } from "../../validations/http-requests/product.js";
+import { warehouseRequestsValidations } from "../../validations/http-requests/warehouse.js";
 
 const validations = warehouseRequestsValidations();
 const productValidations = productRequestsValidations();
@@ -56,13 +54,16 @@ export const warehouseRoutes = new Hono()
             const { id: warehouseId } = c.req.valid("param");
             const { limit, page, where, sort } = c.req.valid("json");
 
-            const { list, count } = await productController.findManyWithStocksAndImageByWarehouseId({
-                warehouseId,
-                limit,
-                page,
-                where,
-                sort,
-            });
+            const { list, count } =
+                await productController.findManyWithStocksAndImageByWarehouseId(
+                    {
+                        warehouseId,
+                        limit,
+                        page,
+                        where,
+                        sort,
+                    },
+                );
 
             return c.json(
                 paginatedResponse({

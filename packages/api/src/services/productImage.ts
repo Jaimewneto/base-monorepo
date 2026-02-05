@@ -1,4 +1,4 @@
-import type { Insertable, SqlBool } from "kysely";
+import type { SqlBool } from "kysely";
 import { client } from "../database/client.js";
 
 import { productImageRepository } from "../database/repositories/productImage.js";

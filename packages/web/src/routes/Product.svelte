@@ -22,6 +22,8 @@
   import { uploadImage } from "$lib/services/image.uploader";
   import type { ProductImageInsertMany } from "$lib/types/productImage";
   import { productImageRequests } from "$lib/services/api-requests/productImage";
+  import MoneyInput from "$lib/components/MoneyInput.svelte";
+  import { numericToBrazilianCurrency } from "$lib/utils";
 
   // Estados da Lista
   let totalRecords = $state(0);
@@ -32,9 +34,13 @@
 
   // Definição das colunas para o seu DataTable
   const columns = [
-    { label: "Descrição", field: "product.description", operator: "ilike", valueType: "string", sortable: true, filterable: true },
-    { label: "Código interno", field: "product.internal_code", operator: "ilike", valueType: "string", sortable: true, filterable: true },
     { label: "SKU", field: "product.sku", operator: "ilike", valueType: "string", sortable: true, filterable: true },
+    { label: "Descrição", field: "product.description", operator: "ilike", valueType: "string", sortable: true, filterable: true },
+    { label: "Cód. fabricante", field: "product.mpn", operator: "ilike", valueType: "string", sortable: true, filterable: true },
+    { label: "Cód. barras", field: "product.gtin", operator: "ilike", valueType: "string", sortable: true, filterable: true },
+    { label: "NCM", field: "product.ncm", operator: "ilike", valueType: "string", sortable: true, filterable: true },
+    { label: "Preço", field: "product.default_price", operator: "=", valueType: "number", sortable: true, filterable: true },
+    { label: "Unidade", field: "product.unit_of_measure", operator: "ilike", valueType: "string", sortable: true, filterable: true },
     { label: "Total em estoque", field: "product.total_in_stocks", operator: "=", valueType: "number", sortable: false, filterable: false },
     { label: "Observações", field: "product.observations", operator: "ilike", valueType: "string", sortable: true, filterable: true },
   ] satisfies Column<WhereField<NonNullable<ProductFindManyWhereArgs>>, SortField<ProductFindManySortArgs>>[];
@@ -51,7 +57,16 @@
   let productToEdit = $state<Product | null>(null);
 
   // Campos do Form
-  let formData = $state({ description: "", internal_code: "", sku: "", observations: null as string | null });
+  let formData = $state({
+    sku: "",
+    description: "",
+    gtin: null as string | null,
+    mpn: null as string | null,
+    ncm: null as string | null,
+    default_price: 0,
+    unit_of_measure: "",
+    observations: null as string | null,
+  });
 
   // Modal de confimação de exclusão
   let deleteDialogOpen = $state(false);
@@ -105,7 +120,7 @@
 
   function openCreate() {
     productToEdit = null;
-    formData = { description: "", internal_code: "", sku: "", observations: null };
+    formData = { sku: "", description: "", gtin: null, mpn: null, ncm: null, default_price: 0, unit_of_measure: "", observations: null };
     productImages = [];
     productImagefiles = [];
     open = true;
@@ -114,9 +129,13 @@
   function openEdit(product: ProductWithStocks) {
     productToEdit = product;
     formData = {
-      description: product.description,
-      internal_code: product.internal_code,
       sku: product.sku,
+      description: product.description,
+      gtin: product.gtin,
+      mpn: product.mpn,
+      ncm: product.ncm,
+      default_price: product.default_price,
+      unit_of_measure: product.unit_of_measure,
       observations: product.observations as string | null,
     };
     productImages = product.images;
@@ -260,9 +279,13 @@
   <DataTable {columns} data={products} {loading} onQueryChange={handleQueryChange} page={currentPage} limit={pageLimit} total={totalRecords}>
     {#each products as product}
       <Table.Row>
-        <Table.Cell>{product.description}</Table.Cell>
-        <Table.Cell>{product.internal_code}</Table.Cell>
         <Table.Cell>{product.sku}</Table.Cell>
+        <Table.Cell>{product.description}</Table.Cell>
+        <Table.Cell>{product.mpn}</Table.Cell>
+        <Table.Cell>{product.gtin}</Table.Cell>
+        <Table.Cell>{product.ncm}</Table.Cell>
+        <Table.Cell>R$ {numericToBrazilianCurrency({ value: product.default_price })}</Table.Cell>
+        <Table.Cell>{product.unit_of_measure}</Table.Cell>
         <Table.Cell>
           <div class="flex items-center gap-2">
             <span class="font-medium">{product.total_in_stocks}</span>
@@ -288,68 +311,90 @@
 </div>
 
 <Sheet.Root bind:open>
-  <Sheet.Content side="right" class="w-[400px] sm:w-[540px]">
-    <Sheet.Header>
+  <Sheet.Content side="right" class="w-[400px] sm:w-[540px] h-screen flex flex-col">
+    <Sheet.Header class="shrink-0">
       <Sheet.Title>{productToEdit ? "Editar produto" : "Novo produto"}</Sheet.Title>
       <Sheet.Description>
         {productToEdit ? "Altere as informações do produto selecionado." : "Preencha os dados para cadastrar um novo produto."}
       </Sheet.Description>
     </Sheet.Header>
 
-    <form onsubmit={handleSubmit} class="grid gap-4 py-6">
-      <div class="grid gap-2">
-        <Label for="description">Descrição</Label>
-        <Input id="description" bind:value={formData.description} placeholder="Descrição do produto" required />
-      </div>
+    <div class="flex-1 overflow-y-auto">
+      <form onsubmit={handleSubmit} class="grid gap-4 py-6 px-1">
+        <div class="grid gap-2">
+          <Label for="description">Descrição</Label>
+          <Input id="description" bind:value={formData.description} placeholder="Descrição do produto" required />
+        </div>
 
-      <div class="grid gap-2">
-        <Label for="internal_code">Código interno</Label>
-        <Input id="internal_code" bind:value={formData.internal_code} disabled={!!productToEdit} placeholder="Ex: 000001" required />
-      </div>
+        <div class="grid gap-2">
+          <Label for="sku">SKU</Label>
+          <Input id="sku" bind:value={formData.sku} required />
+        </div>
 
-      <div class="grid gap-2">
-        <Label for="sku">SKU</Label>
-        <Input id="sku" bind:value={formData.sku} required />
-      </div>
+        <div class="grid gap-2">
+          <Label for="sku">Cód. fabricante</Label>
+          <Input id="sku" bind:value={formData.mpn} />
+        </div>
 
-      <div class="grid gap-2">
-        <Label for="observations">Observações</Label>
-        <Input id="observations" bind:value={formData.observations} placeholder="Observações sobre o produto" />
-      </div>
+        <div class="grid gap-2">
+          <Label for="sku">Cód. barras</Label>
+          <Input id="sku" bind:value={formData.gtin} />
+        </div>
 
-      <div class="grid gap-2">
-        <Label>Imagens do produto</Label>
+        <div class="grid gap-2">
+          <Label for="sku">NCM</Label>
+          <Input id="sku" bind:value={formData.ncm} />
+        </div>
 
-        <ProductImagePicker
-          images={renderedImages}
-          enableMainImage
-          onChange={(newImages: ImageItem[]) => {
-            renderedImages = newImages;
-            // Mantém apenas arquivos locais em productImagefiles para upload
-            productImagefiles = newImages.filter((i) => i.type === "file").map((i) => i.file);
-          }}
-        />
-      </div>
+        <MoneyInput id="price" label="Preço" bind:value={formData.default_price} required />
 
-      <div class="flex justify-end gap-3 mt-4">
-        <Button variant="outline" onclick={() => (open = false)} type="button">Cancelar</Button>
-        <Button type="submit" disabled={saving}>
-          {#if saving}
-            <Loader2 class="mr-2 h-4 w-4 animate-spin" />
-            Salvando...
-          {:else}
-            <Save class="mr-2 h-4 w-4" />
-            Salvar
-          {/if}
-        </Button>
-      </div>
-    </form>
+        <div class="grid gap-2">
+          <Label for="price">Unidade</Label>
+          <Input id="price" bind:value={formData.unit_of_measure} placeholder="UN, KG, L, CX..." required />
+        </div>
+
+        <div class="grid gap-2">
+          <Label for="observations">Observações</Label>
+          <Input id="observations" bind:value={formData.observations} placeholder="Observações sobre o produto" />
+        </div>
+
+        <div class="grid gap-2">
+          <Label>Imagens do produto</Label>
+
+          <ProductImagePicker
+            images={renderedImages}
+            enableMainImage
+            onChange={(newImages: ImageItem[]) => {
+              renderedImages = newImages;
+              // Mantém apenas arquivos locais em productImagefiles para upload
+              productImagefiles = newImages.filter((i) => i.type === "file").map((i) => i.file);
+            }}
+          />
+        </div>
+
+        <div class="sticky bottom-0 bg-background pt-4">
+          <div class="flex justify-end gap-3">
+            <Button variant="outline" type="button" onclick={() => (open = false)}>Cancelar</Button>
+
+            <Button type="submit" disabled={saving}>
+              {#if saving}
+                <Loader2 class="mr-2 h-4 w-4 animate-spin" />
+                Salvando...
+              {:else}
+                <Save class="mr-2 h-4 w-4" />
+                Salvar
+              {/if}
+            </Button>
+          </div>
+        </div>
+      </form>
+    </div>
   </Sheet.Content>
 </Sheet.Root>
 
 <Sheet.Root bind:open={stockSheetOpen}>
-  <Sheet.Content side="right" class="w-[400px] sm:w-[500px]">
-    <Sheet.Header>
+  <Sheet.Content side="right" class="w-[400px] sm:w-[540px] h-screen flex flex-col">
+    <Sheet.Header class="shrink-0">
       <Sheet.Title>Distribuição em Estoque</Sheet.Title>
       <Sheet.Description>
         Ajuste o saldo do produto <span class="font-bold text-foreground">{selectedProductStocks?.description}</span>.

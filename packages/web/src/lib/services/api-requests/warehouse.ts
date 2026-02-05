@@ -120,7 +120,7 @@ export const warehouseRequests = {
         where = { conditions: [] },
         sort,
     }: {
-        id: string,
+        id: string;
         page: number;
         limit: number;
         where: ProductFindManyWhereArgs;
@@ -128,7 +128,7 @@ export const warehouseRequests = {
     }) => {
         const req = await authApi.private.warehouse.list.products[":id"].$post({
             param: {
-                id
+                id,
             },
             json: {
                 page,

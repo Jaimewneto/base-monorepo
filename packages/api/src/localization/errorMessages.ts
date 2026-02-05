@@ -71,6 +71,18 @@ export const errorMessages = {
         pt: "Só é possível enviar uma imagem principal",
         en: "Only one main image is allowed",
     },
+    productSkuAlreadyExists: {
+        pt: "SKU já cadastrado",
+        en: "SKU already exists",
+    },
+    productMpnAlreadyExists: {
+        pt: "Código de fabricante já cadastrado",
+        en: "Manufacturer code already exists",
+    },
+    productGtinAlreadyExists: {
+        pt: "Código de barras já cadastrado",
+        en: "Barcode already exists",
+    },
     // STOCK
     cannotCreateStockWithZeroAmount: {
         pt: "Não é possível criar um estoque com quantidade zero",

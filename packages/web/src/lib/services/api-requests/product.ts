@@ -50,21 +50,33 @@ export const productRequests = {
         return { meta: res.meta, data: res.data };
     },
     create: async ({
-        description,
-        internal_code,
         sku,
+        description,
+        mpn,
+        gtin,
+        ncm,
+        default_price,
+        unit_of_measure,
         observations,
     }: {
-        description: string;
-        internal_code: string;
         sku: string;
+        description: string;
+        mpn: string | null;
+        gtin: string | null;
+        ncm: string | null;
+        default_price: number;
+        unit_of_measure: string;
         observations?: string | null;
     }) => {
         const req = await authApi.private.product.$post({
             json: {
-                description,
-                internal_code,
                 sku,
+                description,
+                mpn,
+                gtin,
+                ncm,
+                default_price,
+                unit_of_measure,
                 observations,
             },
         });
@@ -80,23 +92,35 @@ export const productRequests = {
     },
     updateOneById: async ({
         id,
-        description,
-        internal_code,
         sku,
+        description,
+        mpn,
+        gtin,
+        ncm,
+        default_price,
+        unit_of_measure,
         observations,
     }: {
         id: string;
-        description: string;
-        internal_code: string;
         sku: string;
+        description: string;
+        mpn: string | null;
+        gtin: string | null;
+        ncm: string | null;
+        default_price: number;
+        unit_of_measure: string;
         observations?: string | null;
     }) => {
         const req = await authApi.private.product[":id"].$patch({
             param: { id },
             json: {
-                description,
-                internal_code,
                 sku,
+                description,
+                mpn,
+                gtin,
+                ncm,
+                default_price,
+                unit_of_measure,
                 observations,
             },
         });

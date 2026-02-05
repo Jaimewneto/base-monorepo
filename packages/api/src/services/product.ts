@@ -5,7 +5,12 @@ import { client } from "../database/client.js";
 import { productRepository } from "../database/repositories/product.js";
 import { stockRepository } from "../database/repositories/stock.js";
 import type { Database } from "../database/schema/index.js";
+import type {
+    ProductCreate,
+    ProductUpdate,
+} from "../database/schema/product.js";
 import { BadRequestError } from "../error.js";
+import { productRules } from "../rules/product.js";
 import { getErrorMessage } from "../utils/messageTranslator.js";
 import { baseService } from "./baseService.js";
 
@@ -52,14 +57,27 @@ export const productService = {
             direction: "asc" | "desc";
         }[];
     }) => {
-        return await productRepository(client).findManyWithStocksAndImageByWarehouseId
-        ({
+        return await productRepository(
+            client,
+        ).findManyWithStocksAndImageByWarehouseId({
             warehouseId,
             limit,
             page,
             where,
             orderBy,
         });
+    },
+
+    create: async (data: ProductCreate) => {
+        await productRules({ db: client }).validateCreate(data);
+
+        return await productRepository(client).create(data);
+    },
+
+    update: async ({ id, data }: { id: string; data: ProductUpdate }) => {
+        await productRules({ db: client }).validateUpdate(data);
+
+        return await productRepository(client).updateById({ id, data });
     },
 
     deleteById: async (id: string) => {
