@@ -2,7 +2,7 @@ import type { SqlBool } from "kysely";
 
 import { client } from "../database/client.js";
 
-import { cardexRepository } from "../database/repositories/cardex.js";
+import { inventoryMovementRepository } from "../database/repositories/inventoryMovement.js";
 import { stockRepository } from "../database/repositories/stock.js";
 import { BadRequestError } from "../error.js";
 import { getErrorMessage } from "../utils/messageTranslator.js";
@@ -26,7 +26,7 @@ export const stockService = {
     }) => {
         return await client.transaction().execute(async (trx) => {
             const stockRepo = stockRepository(trx);
-            const cardexRepo = cardexRepository(trx);
+            const inventoryMovementRepo = inventoryMovementRepository(trx);
 
             const existingStock = await stockRepo.findOneByCondition(
                 (eb) =>
@@ -40,7 +40,7 @@ export const stockService = {
                 const amountDifference = amount - existingStock.amount;
 
                 if (amountDifference > 0) {
-                    await cardexRepo.create({
+                    await inventoryMovementRepo.create({
                         tenant_id: existingStock.tenant_id,
                         warehouse_id,
                         product_id,
@@ -51,7 +51,7 @@ export const stockService = {
                 }
 
                 if (amountDifference < 0) {
-                    await cardexRepo.create({
+                    await inventoryMovementRepo.create({
                         tenant_id: existingStock.tenant_id,
                         warehouse_id,
                         product_id,
@@ -79,7 +79,7 @@ export const stockService = {
                 });
             }
 
-            await cardexRepo.create({
+            await inventoryMovementRepo.create({
                 tenant_id,
                 warehouse_id,
                 product_id,

@@ -1,13 +1,13 @@
 import { database } from "../../database/constSchema.js";
-import type { CardexCreateWithoutTenantId } from "../../database/schema/cardex.js";
+import type { InventoryMovementCreateWithoutTenantId } from "../../database/schema/inventoryMovement.js";
 import type { CheckSchema } from "../../types/validation.js";
 import { zod as z } from "./index.js";
 import { queryRequestsValidations } from "./query.js";
 
-export const cardexRequestsValidations = () => {
+export const inventoryMovementRequestsValidations = () => {
     const findMany = queryRequestsValidations({
-        tableName: database.cardexTable.name,
-        tableKeys: database.cardexTable.keys,
+        tableName: database.inventoryMovementTable.name,
+        tableKeys: database.inventoryMovementTable.keys,
     }).WhereSortSchema.extend({
         limit: z.number().int().default(10),
         page: z.number().int().default(1),
@@ -19,7 +19,7 @@ export const cardexRequestsValidations = () => {
         entry: z.number().min(0).default(0),
         exit: z.number().min(0).default(0),
         description: z.string().min(2).max(100),
-    } satisfies CheckSchema<CardexCreateWithoutTenantId>);
+    } satisfies CheckSchema<InventoryMovementCreateWithoutTenantId>);
 
     return {
         findMany,

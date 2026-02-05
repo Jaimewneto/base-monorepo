@@ -1,5 +1,5 @@
 import type { AuditTable } from "./schema/audit.js";
-import type { CardexTable } from "./schema/cardex.js";
+import type { InventoryMovementTable } from "./schema/inventoryMovement.js";
 import type { ProductTable } from "./schema/product.js";
 import type { ProductImageTable } from "./schema/productImage.js";
 import type { StockTable } from "./schema/stock.js";
@@ -28,7 +28,7 @@ export const auditTableKeys = [
 const _checkAuditKeys: AssertAllKeysPresent<AuditTable, typeof auditTableKeys> =
     true;
 
-export const cardexTableKeys = [
+export const inventoryMovementTableKeys = [
     "id",
     "tenant_id",
     "product_id",
@@ -39,11 +39,11 @@ export const cardexTableKeys = [
     "created_at",
     "updated_at",
     "deleted_at",
-] as const satisfies (keyof CardexTable)[];
+] as const satisfies (keyof InventoryMovementTable)[];
 
-const _checkCardexKeys: AssertAllKeysPresent<
-    CardexTable,
-    typeof cardexTableKeys
+const _checkInventoryMovementKeys: AssertAllKeysPresent<
+    InventoryMovementTable,
+    typeof inventoryMovementTableKeys
 > = true;
 
 export const tenantTableKeys = [
@@ -144,9 +144,9 @@ export const database = {
         name: "audit",
         keys: auditTableKeys,
     },
-    cardexTable: {
-        name: "cardex",
-        keys: cardexTableKeys,
+    inventoryMovementTable: {
+        name: "inventory_movement",
+        keys: inventoryMovementTableKeys,
     },
     tenantTable: {
         name: "tenant",
