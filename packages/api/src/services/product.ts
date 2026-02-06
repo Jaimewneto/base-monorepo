@@ -10,7 +10,7 @@ import type {
 } from "../database/schema/product.js";
 import { BadRequestError } from "../error.js";
 import { productRules } from "../rules/product.js";
-import { getErrorMessage } from "../utils/messageTranslator.js";
+import { getMessage } from "../utils/messageTranslator.js";
 import { baseService } from "./baseService.js";
 
 const base = baseService<"product">(productRepository(client));
@@ -96,7 +96,7 @@ export const productService = {
 
             if (inventorys.count > 0) {
                 throw new BadRequestError({
-                    message: getErrorMessage({
+                    message: getMessage({
                         key: "cannotDeleteProductWithExistingInventory",
                     }),
                 });

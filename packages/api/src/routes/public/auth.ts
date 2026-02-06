@@ -47,17 +47,17 @@ export const authRoutes = new Hono()
         },
     )
     .post(
-        "/refresh",
+        "/password-reset-link",
         zodValidate({
             target: "json",
-            schema: validations.refreshToken,
+            schema: validations.passwordReset,
         }),
         async (c) => {
-            const { refreshToken } = c.req.valid("json");
+            const { email } = c.req.valid("json");
 
             return c.json(
                 successResponse({
-                    data: await authController.refreshToken(refreshToken),
+                    data: await authController.sendPasswordResetLink(email),
                 }),
             );
         },

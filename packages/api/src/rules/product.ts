@@ -8,7 +8,7 @@ import type {
     ProductUpdate,
 } from "../database/schema/product.js";
 import { BadRequestError } from "../error.js";
-import { getErrorMessage } from "../utils/messageTranslator.js";
+import { getMessage } from "../utils/messageTranslator.js";
 
 const validateSkuUniqueness = async ({
     sku,
@@ -36,7 +36,7 @@ const validateSkuUniqueness = async ({
 
     if (existingProduct)
         throw new BadRequestError({
-            message: getErrorMessage({ key: "productSkuAlreadyExists" }),
+            message: getMessage({ key: "productSkuAlreadyExists" }),
         });
 };
 
@@ -66,7 +66,7 @@ const validateMpnUniqueness = async ({
 
     if (existingProduct)
         throw new BadRequestError({
-            message: getErrorMessage({ key: "productMpnAlreadyExists" }),
+            message: getMessage({ key: "productMpnAlreadyExists" }),
         });
 };
 
@@ -96,7 +96,7 @@ const validateGtinUniqueness = async ({
 
     if (existingProduct)
         throw new BadRequestError({
-            message: getErrorMessage({ key: "productGtinAlreadyExists" }),
+            message: getMessage({ key: "productGtinAlreadyExists" }),
         });
 };
 

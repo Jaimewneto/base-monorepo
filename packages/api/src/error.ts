@@ -1,12 +1,12 @@
 import type { ContentfulStatusCode } from "hono/utils/http-status";
-import { getErrorMessage } from "./utils/messageTranslator.js";
+import { getMessage } from "./utils/messageTranslator.js";
 
 export class BadRequestError extends Error {
     public code: ContentfulStatusCode;
 
     constructor({
         code = 400,
-        message = getErrorMessage({
+        message = getMessage({
             key: "badRequest",
         }),
         name = "BadRequestError",

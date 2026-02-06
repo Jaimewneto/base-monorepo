@@ -53,6 +53,10 @@ export const errorMessages = {
         pt: "Token expirado",
         en: "Expired token",
     },
+    unableToSendPasswordResetLink: {
+        pt: "Não foi possível enviar o link de redefinição de senha",
+        en: "Unable to send password reset link",
+    },
     // USER
     userEmailAlreadyExists: {
         pt: "Email já cadastrado",

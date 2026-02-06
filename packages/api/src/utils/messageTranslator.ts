@@ -1,14 +1,15 @@
 import { env } from "../env.js";
 
 import { errorMessages } from "../localization/errorMessages.js";
+import { generalMessages } from "../localization/generalMessages.js";
 
 type Language = "en" | "pt";
 
-type MessageKey = keyof typeof errorMessages;
+const messages = { ...errorMessages, ...generalMessages };
 
-const messages = { ...errorMessages };
+type MessageKey = keyof typeof messages;
 
-export const getErrorMessage = ({
+export const getMessage = ({
     key,
     language = env.LANGUAGE,
 }: {

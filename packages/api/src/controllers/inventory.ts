@@ -1,7 +1,7 @@
 import { BadRequestError } from "../error.js";
 import { getCurrentRequestUser } from "../request-context.js";
 import { inventoryService } from "../services/inventory.js";
-import { getErrorMessage } from "../utils/messageTranslator.js";
+import { getMessage } from "../utils/messageTranslator.js";
 import { baseController } from "./baseController.js";
 
 export const base = baseController<"inventory">(inventoryService);
@@ -22,7 +22,7 @@ export const inventoryController = {
 
         if (!user) {
             throw new BadRequestError({
-                message: getErrorMessage({ key: "unauthedUser" }),
+                message: getMessage({ key: "unauthedUser" }),
             });
         }
 

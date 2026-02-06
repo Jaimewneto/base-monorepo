@@ -4,7 +4,7 @@ import { client } from "../database/client.js";
 import { inventoryRepository } from "../database/repositories/inventory.js";
 import { inventoryMovementRepository } from "../database/repositories/inventoryMovement.js";
 import { BadRequestError } from "../error.js";
-import { getErrorMessage } from "../utils/messageTranslator.js";
+import { getMessage } from "../utils/messageTranslator.js";
 import { baseService } from "./baseService.js";
 
 const base = baseService<"inventory">(inventoryRepository(client));
@@ -72,7 +72,7 @@ export const inventoryService = {
 
             if (amount === 0) {
                 throw new BadRequestError({
-                    message: getErrorMessage({
+                    message: getMessage({
                         key: "cannotCreateInventoryWithZeroAmount",
                     }),
                 });

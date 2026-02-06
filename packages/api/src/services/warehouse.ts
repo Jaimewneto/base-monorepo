@@ -4,7 +4,7 @@ import { client } from "../database/client.js";
 import { inventoryRepository } from "../database/repositories/inventory.js";
 import { warehouseRepository } from "../database/repositories/warehouse.js";
 import { BadRequestError } from "../error.js";
-import { getErrorMessage } from "../utils/messageTranslator.js";
+import { getMessage } from "../utils/messageTranslator.js";
 import { baseService } from "./baseService.js";
 
 const base = baseService<"warehouse">(warehouseRepository(client));
@@ -29,7 +29,7 @@ export const warehouseService = {
 
             if (inventorys.count > 0) {
                 throw new BadRequestError({
-                    message: getErrorMessage({
+                    message: getMessage({
                         key: "cannotDeleteWarehouseWithExistingInventory",
                     }),
                 });

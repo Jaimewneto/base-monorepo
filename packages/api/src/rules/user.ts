@@ -6,7 +6,7 @@ import type { Database } from "../database/schema/index.js";
 
 import { BadRequestError } from "../error.js";
 
-import { getErrorMessage } from "../utils/messageTranslator.js";
+import { getMessage } from "../utils/messageTranslator.js";
 
 export const userRules = (db: Kysely<Database>) => ({
     validateEmailUniqueness: async (email: string) => {
@@ -19,7 +19,7 @@ export const userRules = (db: Kysely<Database>) => ({
 
         if (existingUser)
             throw new BadRequestError({
-                message: getErrorMessage({ key: "userEmailAlreadyExists" }),
+                message: getMessage({ key: "userEmailAlreadyExists" }),
             });
     },
 });

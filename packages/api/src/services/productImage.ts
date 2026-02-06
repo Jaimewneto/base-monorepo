@@ -7,7 +7,7 @@ import type {
     ProductImageCreate,
 } from "../database/schema/productImage.js";
 import { BadRequestError } from "../error.js";
-import { getErrorMessage } from "../utils/messageTranslator.js";
+import { getMessage } from "../utils/messageTranslator.js";
 import { baseService } from "./baseService.js";
 
 const base = baseService<"product_image">(productImageRepository(client));
@@ -20,7 +20,7 @@ export const productImageService = {
     insertMany: async (data: CreateOrUpdateImages) => {
         if (data.length > 10) {
             throw new BadRequestError({
-                message: getErrorMessage({
+                message: getMessage({
                     key: "cannotUploadMoreThanTenImages",
                 }),
             });
@@ -30,7 +30,7 @@ export const productImageService = {
 
         if (mainImages.length > 1) {
             throw new BadRequestError({
-                message: getErrorMessage({
+                message: getMessage({
                     key: "oneMainImageOnly",
                 }),
             });

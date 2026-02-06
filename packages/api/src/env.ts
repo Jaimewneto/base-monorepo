@@ -12,6 +12,7 @@ const envSchema = z.object({
     LANGUAGE: z.enum(["pt", "en"]).default("pt"),
 
     JWT_SECRET: z.string().min(20),
+    PASSWORD_RESET_JWT_SECRET: z.string().min(20),
 
     DB_HOST: z.string().min(1),
     DB_PORT: z.coerce.number().default(5432),
@@ -26,13 +27,16 @@ const envSchema = z.object({
     FRONTEND_URL_DEV: z.url().default("http://localhost:5173"),
     FRONTEND_URL_PREVIEW: z.url().default("http://localhost:4173"),
     FRONTEND_URL_PROD: z.url(),
+
+    API_EMAIL: z.email(),
+    API_EMAIL_PASSWORD: z.string().min(1),
 });
 
 const _env = envSchema.safeParse(process.env);
 
 if (!_env.success) {
     logger.error(
-        `❌ Invalid environment variables: ${JSON.stringify(_env.error.format())}`,
+        `Invalid environment variables: ${JSON.stringify(_env.error.format())}`,
     );
     process.exit(1);
 }
