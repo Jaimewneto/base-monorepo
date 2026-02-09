@@ -45,6 +45,11 @@ export const authRequests = {
 
         return res.data;
     },
+    sendPasswordResetLink: async (email: string) => {
+        const req = await api.public.auth["password-reset-link"].$post({
+            json: { email },
+        });
+    },
     resetPassword: async ({ passwordResetToken, password }: { passwordResetToken: string; password: string }) => {
         const req = await api.public.auth["reset-password"].$post({
             json: { passwordResetToken, password },
