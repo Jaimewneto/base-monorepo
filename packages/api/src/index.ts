@@ -17,8 +17,10 @@ const server = new Hono()
                 env.NODE_ENV === "production"
                     ? env.FRONTEND_URL_PROD
                     : [env.FRONTEND_URL_DEV, env.FRONTEND_URL_PREVIEW],
+            credentials: true,
             allowHeaders: ["Authorization", "Content-Type"],
             allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+            exposeHeaders: ["Set-Cookie"],
             maxAge: 86400,
         }),
     )

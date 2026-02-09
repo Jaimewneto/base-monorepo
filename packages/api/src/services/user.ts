@@ -33,10 +33,7 @@ export const userService = {
         return await base.create(user);
     },
 
-    updateById: async (params: {
-        id: string;
-        data: UserUpdate;
-    }) => {
+    updateById: async (params: { id: string; data: UserUpdate }) => {
         if (params.data.password) {
             const hashedPassword = await hash(params.data.password);
 

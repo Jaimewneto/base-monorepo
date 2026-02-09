@@ -7,5 +7,5 @@ export const generalMessages = {
     passwordResetEmailTitle: {
         pt: "Redefinição de senha",
         en: "Password reset",
-    }
+    },
 } as const;

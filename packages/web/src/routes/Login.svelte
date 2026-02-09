@@ -34,9 +34,10 @@
         return;
       }
 
-      const { user, credentials } = await authRequests.login({ email, password });
+      const { user, accessToken } = await authRequests.login({ email, password });
 
-      authStore.setCredentials({ credentials, user });
+      authStore.setCredentials({ accessToken, user });
+
       email = "";
       password = "";
 

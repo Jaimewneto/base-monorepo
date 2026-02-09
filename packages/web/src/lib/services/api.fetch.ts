@@ -5,16 +5,14 @@ import { authStore } from "$lib/auth/auth.store";
 
 export async function apiFetch(input: RequestInfo | URL, init?: RequestInit) {
     const doFetch = () => {
-        const { credentials } = get(authStore);
+        const { accessToken } = get(authStore);
 
         return fetch(input, {
             ...init,
             headers: {
                 ...init?.headers,
                 "Content-Type": "application/json",
-                Authorization: credentials?.accessToken
-                    ? `Bearer ${credentials.accessToken}`
-                    : "",
+                Authorization: accessToken ? `Bearer ${accessToken}` : "",
             },
         });
     };

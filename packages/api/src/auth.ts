@@ -7,14 +7,10 @@ import nodemailer from "nodemailer";
 import { env } from "./env.js";
 
 import { BadRequestError } from "./error.js";
-
-import { userService } from "./services/user.js";
-
-import type { JWTPayload } from "./types/auth.js";
-
-import { getMessage } from "./utils/messageTranslator.js";
-
 import { logger } from "./logger.js";
+import { userService } from "./services/user.js";
+import type { JWTPayload } from "./types/auth.js";
+import { getMessage } from "./utils/messageTranslator.js";
 
 export const login = async ({
     email,
@@ -52,7 +48,7 @@ export const login = async ({
     })
         .setProtectedHeader({ alg: "HS256" })
         .setIssuedAt()
-        .setExpirationTime("2h")
+        .setExpirationTime("30m")
         .sign(new TextEncoder().encode(env.JWT_SECRET));
 
     const refreshToken = await new jose.SignJWT({
@@ -70,7 +66,7 @@ export const login = async ({
         password: undefined,
     };
 
-    return { user: userRes, credentials: { accessToken, refreshToken } };
+    return { user: userRes, accessToken, refreshToken };
 };
 
 export const me = async (token: string) => {
@@ -117,7 +113,7 @@ export const refreshToken = async (token: string) => {
         })
             .setProtectedHeader({ alg: "HS256" })
             .setIssuedAt()
-            .setExpirationTime("2h")
+            .setExpirationTime("30m")
             .sign(new TextEncoder().encode(env.JWT_SECRET));
 
         const newRefreshToken = await new jose.SignJWT({
@@ -132,10 +128,8 @@ export const refreshToken = async (token: string) => {
 
         return {
             user: payload,
-            credentials: {
-                accessToken: newAccessToken,
-                refreshToken: newRefreshToken,
-            },
+            accessToken: newAccessToken,
+            refreshToken: newRefreshToken,
         };
     } catch {
         throw new BadRequestError({
@@ -163,7 +157,7 @@ export const sendPasswordResetLink = async (email: string) => {
         .sign(new TextEncoder().encode(env.PASSWORD_RESET_JWT_SECRET));
 
     try {
-        let transporter = nodemailer.createTransport({
+        const transporter = nodemailer.createTransport({
             service: "gmail", // Or another email service
             auth: {
                 user: env.API_EMAIL,
@@ -171,7 +165,10 @@ export const sendPasswordResetLink = async (email: string) => {
             },
         });
 
-        const baseUrl = env.NODE_ENV === "development" ? env.FRONTEND_URL_DEV : env.FRONTEND_URL_PROD;
+        const baseUrl =
+            env.NODE_ENV === "development"
+                ? env.FRONTEND_URL_DEV
+                : env.FRONTEND_URL_PROD;
 
         const url = `${baseUrl}/password-reset?passwordResetToken=${passwordResetToken}`;
 
@@ -193,7 +190,13 @@ export const sendPasswordResetLink = async (email: string) => {
     }
 };
 
-export const resetPassword = async ({ passwordResetToken, password }: { passwordResetToken: string, password: string }) => {
+export const resetPassword = async ({
+    passwordResetToken,
+    password,
+}: {
+    passwordResetToken: string;
+    password: string;
+}) => {
     try {
         const { payload }: { payload: JWTPayload } = await jose.jwtVerify(
             passwordResetToken,

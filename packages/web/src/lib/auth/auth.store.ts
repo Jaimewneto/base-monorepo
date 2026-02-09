@@ -2,19 +2,14 @@
 import { writable } from "svelte/store";
 import type { AuthUser } from "$lib/types/api-returns/auth";
 
-export interface Credentials {
-    accessToken: string;
-    refreshToken: string;
-}
-
 interface AuthState {
-    credentials: Credentials | null;
+    accessToken: string | null;
     user: AuthUser | null;
     isAuthenticated: boolean;
 }
 
 const initial: AuthState = {
-    credentials: null,
+    accessToken: null,
     user: null,
     isAuthenticated: false,
 };
@@ -27,8 +22,7 @@ function getInitialState(): AuthState {
         if (!raw) return initial;
         const parsed = JSON.parse(raw) as AuthState;
 
-        // Só considera autenticado se tiver credentials e user
-        if (parsed.credentials && parsed.user) {
+        if (parsed.accessToken && parsed.user) {
             return { ...parsed, isAuthenticated: true };
         }
 
@@ -39,19 +33,19 @@ function getInitialState(): AuthState {
 }
 
 function createAuthStore() {
-    const { subscribe, set, update } = writable<AuthState>(getInitialState());
+    const { subscribe, set } = writable<AuthState>(getInitialState());
 
     return {
         subscribe,
 
         setCredentials({
-            credentials,
+            accessToken,
             user,
         }: {
-            credentials: Credentials;
+            accessToken: string;
             user: AuthUser;
         }) {
-            const newState = { credentials, user, isAuthenticated: true };
+            const newState = { accessToken, user, isAuthenticated: true };
             localStorage.setItem("auth", JSON.stringify(newState));
             set(newState);
         },

@@ -10,23 +10,19 @@ export const authManager = {
         if (refreshPromise) return refreshPromise;
 
         refreshPromise = (async () => {
-            const { credentials } = get(authStore);
+            const { accessToken, user } = await authRequests.refresh();
 
-            if (!credentials?.refreshToken) throw new Error("No refresh token");
-
-            const { credentials: tokens, user } = await authRequests.refresh(
-                credentials.refreshToken,
-            );
-
-            authStore.setCredentials({ credentials: tokens, user });
+            authStore.setCredentials({ accessToken, user });
         })();
 
         try {
             await refreshPromise;
         } catch {
             authStore.logout();
+            // Chama logout no backend pra limpar o cookie
+            await authRequests.logout();
             window.location.href = "/login";
-            throw new Error("Session expired");
+            throw new Error("Sessão expirada");
         } finally {
             refreshPromise = null;
         }
