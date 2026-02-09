@@ -45,4 +45,18 @@ export const authRequests = {
 
         return res.data;
     },
+    resetPassword: async ({ passwordResetToken, password }: { passwordResetToken: string; password: string }) => {
+        const req = await api.public.auth["reset-password"].$post({
+            json: { passwordResetToken, password },
+        });
+
+        if (!req) throw new Error("Request failed");
+
+        const res = await req.json();
+
+        if (!res.success)
+            throw new Error(res?.error?.message || "Request failed");
+
+        return res.data;
+    },
 };

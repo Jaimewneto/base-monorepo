@@ -8,7 +8,9 @@ import { BadRequestError } from "../error.js";
 
 import { getMessage } from "../utils/messageTranslator.js";
 
-export const userRules = (db: Kysely<Database>) => ({
+import { client } from "../database/client.js";
+
+export const userRules = (db: Kysely<Database> = client) => ({
     validateEmailUniqueness: async (email: string) => {
         const existingUser = await userRepository(db).findOneByCondition(
             (eb) =>

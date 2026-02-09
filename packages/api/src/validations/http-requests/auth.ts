@@ -11,6 +11,11 @@ export const authRequestsValidations = () => {
     });
 
     const passwordReset = z.object({
+        passwordResetToken: z.string(),
+        password: z.string().min(2).max(100),
+    });
+
+    const passwordResetLink = z.object({
         email: z.email(),
     });
 
@@ -22,6 +27,7 @@ export const authRequestsValidations = () => {
         me,
         login,
         passwordReset,
+        passwordResetLink,
         refreshToken,
     };
 };

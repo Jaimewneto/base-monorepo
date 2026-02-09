@@ -3,8 +3,10 @@ import type { SqlBool } from "kysely";
 
 import { userRepository } from "../database/repositories/user.js";
 
-import type { UserCreate } from "../database/schema/user.js";
+import type { UserCreate, UserUpdate } from "../database/schema/user.js";
+
 import { userRules } from "../rules/user.js";
+
 import { baseService } from "./baseService.js";
 
 const base = baseService<"user">(userRepository());
@@ -29,5 +31,18 @@ export const userService = {
         user.password = hashedPassword;
 
         return await base.create(user);
+    },
+
+    updateById: async (params: {
+        id: string;
+        data: UserUpdate;
+    }) => {
+        if (params.data.password) {
+            const hashedPassword = await hash(params.data.password);
+
+            params.data.password = hashedPassword;
+        }
+
+        return await base.updateById(params);
     },
 };

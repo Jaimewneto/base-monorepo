@@ -50,7 +50,7 @@ export const authRoutes = new Hono()
         "/password-reset-link",
         zodValidate({
             target: "json",
-            schema: validations.passwordReset,
+            schema: validations.passwordResetLink,
         }),
         async (c) => {
             const { email } = c.req.valid("json");
@@ -58,6 +58,25 @@ export const authRoutes = new Hono()
             return c.json(
                 successResponse({
                     data: await authController.sendPasswordResetLink(email),
+                }),
+            );
+        },
+    )
+    .post(
+        "/reset-password",
+        zodValidate({
+            target: "json",
+            schema: validations.passwordReset,
+        }),
+        async (c) => {
+            const { passwordResetToken, password } = c.req.valid("json");
+
+            return c.json(
+                successResponse({
+                    data: await authController.resetPassword({
+                        passwordResetToken,
+                        password,
+                    }),
                 }),
             );
         },

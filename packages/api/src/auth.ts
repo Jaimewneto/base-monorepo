@@ -192,3 +192,33 @@ export const sendPasswordResetLink = async (email: string) => {
         });
     }
 };
+
+export const resetPassword = async ({ passwordResetToken, password }: { passwordResetToken: string, password: string }) => {
+    try {
+        const { payload }: { payload: JWTPayload } = await jose.jwtVerify(
+            passwordResetToken,
+            new TextEncoder().encode(env.PASSWORD_RESET_JWT_SECRET),
+        );
+
+        const user = await userService.findOneById(payload.id);
+
+        if (!user)
+            throw new BadRequestError({
+                code: 404,
+                message: getMessage({
+                    key: "notFound",
+                }),
+                name: "UserNotFoundError",
+            });
+
+        await userService.updateById({ id: user.id, data: { password } });
+    } catch {
+        throw new BadRequestError({
+            code: 401,
+            message: getMessage({
+                key: "unableToResetPassword",
+            }),
+            name: "InvalidPasswordResetTokenError",
+        });
+    }
+};

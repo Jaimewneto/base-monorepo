@@ -57,6 +57,10 @@ export const errorMessages = {
         pt: "Não foi possível enviar o link de redefinição de senha",
         en: "Unable to send password reset link",
     },
+    unableToResetPassword: {
+        pt: "Não foi possível redefinir a senha",
+        en: "Unable to reset password",
+    },
     // USER
     userEmailAlreadyExists: {
         pt: "Email já cadastrado",
