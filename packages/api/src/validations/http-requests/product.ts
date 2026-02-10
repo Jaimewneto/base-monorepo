@@ -22,16 +22,24 @@ export const productRequestsValidations = () => {
     });
 
     const create = z.object({
-        description: z.string().min(2).max(100),
-        internal_code: z.string().min(2).max(100),
         sku: z.string().min(2).max(100),
+        description: z.string().min(2).max(100),
+        mpn: z.string().max(100).nullable().optional(),
+        gtin: z.string().min(8).max(14).nullable().optional(),
+        ncm: z.string().min(8).max(8).nullable().optional(),
+        default_price: z.number().min(0.01),
+        unit_of_measure: z.string().min(2).max(100),
         observations: z.string().min(2).max(100).nullable().optional(),
     } satisfies CheckSchema<ProductCreateWithoutTenantId>);
 
     const updateById = z.object({
-        description: z.string().min(2).max(100),
-        internal_code: z.string().min(2).max(100),
         sku: z.string().min(2).max(100),
+        description: z.string().min(2).max(100),
+        mpn: z.string().max(100).nullable().optional(),
+        gtin: z.string().min(8).max(14).nullable().optional(),
+        ncm: z.string().min(8).max(8).nullable().optional(),
+        default_price: z.number().min(0.01),
+        unit_of_measure: z.string().min(2).max(100),
         observations: z.string().min(2).max(100).nullable().optional(),
     } satisfies CheckSchema<ProductUpdate>);
 

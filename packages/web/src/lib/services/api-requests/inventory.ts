@@ -1,6 +1,6 @@
 import { authApi } from "../api.client";
 
-export const stockRequests = {
+export const inventoryRequests = {
     create: async ({
         warehouse_id,
         product_id,
@@ -10,7 +10,7 @@ export const stockRequests = {
         product_id: string;
         amount: number;
     }) => {
-        const req = await authApi.private.stock.$post({
+        const req = await authApi.private.inventory.$post({
             json: {
                 warehouse_id,
                 product_id,

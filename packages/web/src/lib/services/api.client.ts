@@ -13,6 +13,6 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 export const api = createClient(API_URL);
 
 export const authApi = createAuthenticatedClient(API_URL, {
-    getAccessToken: () => get(authStore).credentials?.accessToken ?? null,
+    getAccessToken: () => get(authStore).accessToken ?? null,
     fetch: apiFetch,
 });

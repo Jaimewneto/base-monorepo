@@ -7,9 +7,10 @@ import type {
     Updateable,
 } from "kysely";
 
-export interface CardexTable {
+export interface InventoryMovementTable {
     id: Generated<string>;
     tenant_id: string;
+    user_id: string;
     product_id: string;
     warehouse_id: string;
     entry: number;
@@ -20,8 +21,11 @@ export interface CardexTable {
     deleted_at: ColumnType<Date, string | undefined, Date>;
 }
 
-export type Cardex = Selectable<CardexTable>;
-export type CardexCreate = Insertable<CardexTable>;
-export type CardexUpdate = Updateable<CardexTable>;
+export type InventoryMovement = Selectable<InventoryMovementTable>;
+export type InventoryMovementCreate = Insertable<InventoryMovementTable>;
+export type InventoryMovementUpdate = Updateable<InventoryMovementTable>;
 
-export type CardexCreateWithoutTenantId = Omit<CardexCreate, "tenant_id">;
+export type InventoryMovementCreateWithoutTenantId = Omit<
+    InventoryMovementCreate,
+    "tenant_id"
+>;

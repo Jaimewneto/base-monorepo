@@ -11,7 +11,7 @@ const tableName = "product" as const;
 
 type TableName = typeof tableName;
 
-type WarehouseStock = {
+type WarehouseInventory = {
     warehouse_id: string;
     warehouse_description: string;
     amount: number;
@@ -31,7 +31,7 @@ const base = (db = client) =>
 export const productRepository = (db = client) => ({
     ...base(db),
 
-    findManyWithStock: async ({
+    findManyWithInventoriesAndImage: async ({
         page = 1,
         limit = 10,
         where,
@@ -61,7 +61,7 @@ export const productRepository = (db = client) => ({
                 (eb) =>
                     eb
                         .selectFrom("warehouse as w")
-                        .leftJoin("stock as s", (join) =>
+                        .leftJoin("inventory as s", (join) =>
                             join
                                 .onRef("s.warehouse_id", "=", "w.id")
                                 .onRef("s.product_id", "=", `${tableName}.id`)
@@ -80,14 +80,14 @@ export const productRepository = (db = client) => ({
                                     ),
                                     '[]'::json
                                 )
-                            `.as("stocks"),
+                            `.as("inventories"),
                             sql`
                                 coalesce(sum(coalesce(s.amount, 0)), 0)
-                            `.as("total_in_stocks"),
+                            `.as("total_in_inventories"),
                         ])
                         .whereRef("w.tenant_id", "=", `${tableName}.tenant_id`)
                         .where("w.deleted_at", "is", null)
-                        .as("warehouse_stocks"),
+                        .as("warehouse_inventories"),
                 (join) => join.onTrue(),
             )
             .leftJoinLateral(
@@ -117,12 +117,14 @@ export const productRepository = (db = client) => ({
             )
             .selectAll(tableName)
             .select([
-                sql<number>`coalesce(warehouse_stocks.total_in_stocks, 0)::float8`.as(
-                    "total_in_stocks",
+                sql<number>`coalesce(warehouse_inventories.total_in_inventories, 0)::float8`.as(
+                    "total_in_inventories",
                 ),
                 sql<
-                    WarehouseStock[]
-                >`coalesce(warehouse_stocks.stocks, '[]'::json)`.as("stocks"),
+                    WarehouseInventory[]
+                >`coalesce(warehouse_inventories.inventories, '[]'::json)`.as(
+                    "inventories",
+                ),
                 sql<SimplifiedImage[]>`coalesce(images.images, '[]'::json)`.as(
                     "images",
                 ),
@@ -157,6 +159,177 @@ export const productRepository = (db = client) => ({
 
         listQuery = listQuery.orderBy("id", "desc");
 
+        const { count } = await countQuery.executeTakeFirstOrThrow();
+        const list = await listQuery.limit(limit).offset(offset).execute();
+
+        return {
+            count: Number(count),
+            list,
+        };
+    },
+
+    findManyWithInventoriesAndImageByWarehouseId: async ({
+        warehouseId,
+        page = 1,
+        limit = 10,
+        where,
+        orderBy,
+    }: {
+        warehouseId: string;
+        page: number;
+        limit: number;
+        where?: (eb: ExpressionBuilder<Database, TableName>) => SqlBool;
+        orderBy?: {
+            column: keyof Database[TableName] & string;
+            direction: "asc" | "desc";
+        }[];
+    }) => {
+        const user = getCurrentRequestUser();
+        const offset = (page - 1) * limit;
+
+        /**
+         * 🔒 Filtro semântico:
+         * produto só entra se tiver estoque > 0
+         * no warehouse informado
+         */
+        const hasInventoryInWarehouse = (
+            eb: ExpressionBuilder<Database, TableName>,
+        ) =>
+            eb.exists(
+                eb
+                    .selectFrom("inventory as s")
+                    .whereRef("s.product_id", "=", `${tableName}.id`)
+                    .where("s.warehouse_id", "=", warehouseId)
+                    .where("s.amount", ">", 0)
+                    .where("s.deleted_at", "is", null),
+            );
+
+        // ==========================
+        // COUNT QUERY
+        // ==========================
+        let countQuery = db
+            .selectFrom(tableName)
+            // @ts-expect-error
+            .select(sql`count(*) as count`)
+            .where(`${tableName}.deleted_at`, "is", null)
+            .where(hasInventoryInWarehouse);
+
+        // ==========================
+        // LIST QUERY
+        // ==========================
+        let listQuery = db
+            .selectFrom(tableName)
+            /**
+             * 📦 Estoque do warehouse específico
+             */
+            .leftJoinLateral(
+                (eb) =>
+                    eb
+                        .selectFrom("inventory as s")
+                        .innerJoin("warehouse as w", "w.id", "s.warehouse_id")
+                        .select([
+                            sql`
+              json_build_object(
+                'warehouse_id', w.id,
+                'warehouse_description', w.description,
+                'amount', s.amount
+              )
+            `.as("inventory"),
+                            sql<number>`s.amount::float8`.as(
+                                "total_in_inventories",
+                            ),
+                        ])
+                        .whereRef("s.product_id", "=", `${tableName}.id`)
+                        .where("s.warehouse_id", "=", warehouseId)
+                        .where("s.amount", ">", 0)
+                        .where("s.deleted_at", "is", null)
+                        .where("w.deleted_at", "is", null)
+                        .as("warehouse_inventory"),
+                (join) => join.onTrue(),
+            )
+            /**
+             * 🖼️ Imagens do produto
+             */
+            .leftJoinLateral(
+                (eb) =>
+                    eb
+                        .selectFrom("product_image as pi")
+                        .select([
+                            sql`
+              coalesce(
+                json_agg(
+                  json_build_object(
+                    'id', pi.id,
+                    'tenant_id', pi.tenant_id,
+                    'product_id', pi.product_id,
+                    'url', pi.url,
+                    'main', pi.main
+                  )
+                ),
+                '[]'::json
+              )
+            `.as("images"),
+                        ])
+                        .whereRef("pi.product_id", "=", `${tableName}.id`)
+                        .where("pi.deleted_at", "is", null)
+                        .as("images"),
+                (join) => join.onTrue(),
+            )
+            .selectAll(tableName)
+            .select([
+                sql<number>`warehouse_inventory.total_in_inventories`.as(
+                    "total_in_inventories",
+                ),
+                sql<WarehouseInventory[]>`warehouse_inventory.inventory`.as(
+                    "inventories",
+                ),
+                sql<SimplifiedImage[]>`coalesce(images.images, '[]'::json)`.as(
+                    "images",
+                ),
+            ])
+            .where(`${tableName}.deleted_at`, "is", null)
+            .where(hasInventoryInWarehouse);
+
+        // ==========================
+        // WHERE dinâmico
+        // ==========================
+        if (where) {
+            // @ts-expect-error
+            countQuery = countQuery.where(where);
+            // @ts-expect-error
+            listQuery = listQuery.where(where);
+        }
+
+        // ==========================
+        // TENANT
+        // ==========================
+        if (user && hasTenantIdColumn(tableName)) {
+            countQuery = countQuery.where(
+                `${tableName}.tenant_id`,
+                "=",
+                user.tenant_id,
+            );
+            listQuery = listQuery.where(
+                `${tableName}.tenant_id`,
+                "=",
+                user.tenant_id,
+            );
+        }
+
+        // ==========================
+        // ORDER BY
+        // ==========================
+        if (orderBy) {
+            for (const sort of orderBy) {
+                listQuery = listQuery.orderBy(sort.column, sort.direction);
+            }
+        }
+
+        listQuery = listQuery.orderBy("id", "desc");
+
+        // ==========================
+        // EXECUÇÃO
+        // ==========================
         const { count } = await countQuery.executeTakeFirstOrThrow();
         const list = await listQuery.limit(limit).offset(offset).execute();
 

@@ -14,7 +14,7 @@ import type { Where } from "../types/http-query/where.js";
 import type { ZodSortMap, ZodWhereMap } from "../types/http-query/zod.js";
 import type { BaseService } from "../types/service.js";
 import { buildOrderBy, buildWhereExpression } from "../utils/http-query.js";
-import { getErrorMessage } from "../utils/messageTranslator.js";
+import { getMessage } from "../utils/messageTranslator.js";
 
 export const baseController = <K extends keyof Database>(
     service: BaseService<K>,
@@ -24,7 +24,7 @@ export const baseController = <K extends keyof Database>(
 
         if (!data) {
             throw new BadRequestError({
-                message: getErrorMessage({ key: "notFound" }),
+                message: getMessage({ key: "notFound" }),
                 code: 404,
             });
         }
@@ -39,7 +39,7 @@ export const baseController = <K extends keyof Database>(
 
         if (!data) {
             throw new BadRequestError({
-                message: getErrorMessage({ key: "notFound" }),
+                message: getMessage({ key: "notFound" }),
                 code: 404,
             });
         }

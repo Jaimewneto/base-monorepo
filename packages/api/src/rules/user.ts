@@ -1,14 +1,11 @@
 import type { Kysely, SqlBool } from "kysely";
-
+import { client } from "../database/client.js";
 import { userRepository } from "../database/repositories/user.js";
-
 import type { Database } from "../database/schema/index.js";
-
 import { BadRequestError } from "../error.js";
+import { getMessage } from "../utils/messageTranslator.js";
 
-import { getErrorMessage } from "../utils/messageTranslator.js";
-
-export const userRules = (db?: Kysely<Database>) => ({
+export const userRules = (db: Kysely<Database> = client) => ({
     validateEmailUniqueness: async (email: string) => {
         const existingUser = await userRepository(db).findOneByCondition(
             (eb) =>
@@ -19,7 +16,7 @@ export const userRules = (db?: Kysely<Database>) => ({
 
         if (existingUser)
             throw new BadRequestError({
-                message: getErrorMessage({ key: "userEmailAlreadyExists" }),
+                message: getMessage({ key: "userEmailAlreadyExists" }),
             });
     },
 });

@@ -3,12 +3,15 @@ import type {
     Insertable,
     Selectable,
     SqlBool,
+    Transaction,
     Updateable,
 } from "kysely";
 
 import type { Database } from "../database/schema/index.js";
 
 export interface BaseRepository<K extends keyof Database> {
+    getTableName(): K;
+
     findOneById(id: string): Promise<Selectable<Database[K]> | null>;
 
     findOneByCondition(
@@ -25,12 +28,19 @@ export interface BaseRepository<K extends keyof Database> {
         }[];
     }): Promise<{ count: number; list: Selectable<Database[K]>[] }>;
 
-    create(data: Insertable<Database[K]>): Promise<Selectable<Database[K]>>;
+    create(params: {
+        data: Insertable<Database[K]>;
+        client?: Transaction<Database>;
+    }): Promise<Selectable<Database[K]>>;
 
     updateById(params: {
         id: string;
         data: Updateable<Database[K]>;
+        client?: Transaction<Database>;
     }): Promise<Selectable<Database[K]>>;
 
-    deleteById(id: string): Promise<Selectable<Database[K]>>;
+    deleteById(params: {
+        id: string;
+        client?: Transaction<Database>;
+    }): Promise<Selectable<Database[K]>>;
 }

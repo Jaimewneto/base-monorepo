@@ -1,4 +1,4 @@
-import type { Insertable, SqlBool } from "kysely";
+import type { SqlBool } from "kysely";
 import { client } from "../database/client.js";
 
 import { productImageRepository } from "../database/repositories/productImage.js";
@@ -7,7 +7,7 @@ import type {
     ProductImageCreate,
 } from "../database/schema/productImage.js";
 import { BadRequestError } from "../error.js";
-import { getErrorMessage } from "../utils/messageTranslator.js";
+import { getMessage } from "../utils/messageTranslator.js";
 import { baseService } from "./baseService.js";
 
 const base = baseService<"product_image">(productImageRepository(client));
@@ -20,7 +20,7 @@ export const productImageService = {
     insertMany: async (data: CreateOrUpdateImages) => {
         if (data.length > 10) {
             throw new BadRequestError({
-                message: getErrorMessage({
+                message: getMessage({
                     key: "cannotUploadMoreThanTenImages",
                 }),
             });
@@ -30,7 +30,7 @@ export const productImageService = {
 
         if (mainImages.length > 1) {
             throw new BadRequestError({
-                message: getErrorMessage({
+                message: getMessage({
                     key: "oneMainImageOnly",
                 }),
             });
@@ -53,7 +53,7 @@ export const productImageService = {
                 const exists = data.find((img) => img.id === item.id);
 
                 if (!exists) {
-                    await repo.deleteById(item.id);
+                    await repo.deleteById({ id: item.id });
                 }
             }
 
@@ -75,7 +75,7 @@ export const productImageService = {
                     continue;
                 }
 
-                await repo.create(item as ProductImageCreate);
+                await repo.create({ data: item as ProductImageCreate });
             }
         });
 

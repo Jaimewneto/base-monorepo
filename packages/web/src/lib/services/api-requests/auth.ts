@@ -31,9 +31,39 @@ export const authRequests = {
 
         return res.data;
     },
-    refresh: async (refreshToken: string) => {
-        const req = await api.public.auth.refresh.$post({
-            json: { refreshToken },
+    refresh: async () => {
+        console.log("POOOOOOORRA");
+        const req = await api.public.auth.refresh.$post();
+
+        if (!req) throw new Error("Request failed");
+
+        const res = await req.json();
+
+        if (!res.success) throw new Error("Request failed");
+
+        return res.data;
+    },
+    logout: async () => {
+        const req = await api.public.auth.logout.$post();
+
+        const res = await req.json();
+
+        if (!res.success) throw new Error("Request failed");
+    },
+    sendPasswordResetLink: async (email: string) => {
+        const req = await api.public.auth["password-reset-link"].$post({
+            json: { email },
+        });
+    },
+    resetPassword: async ({
+        passwordResetToken,
+        password,
+    }: {
+        passwordResetToken: string;
+        password: string;
+    }) => {
+        const req = await api.public.auth["reset-password"].$post({
+            json: { passwordResetToken, password },
         });
 
         if (!req) throw new Error("Request failed");

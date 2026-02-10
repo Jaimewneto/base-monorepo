@@ -53,15 +53,23 @@ export const errorMessages = {
         pt: "Token expirado",
         en: "Expired token",
     },
+    unableToSendPasswordResetLink: {
+        pt: "Não foi possível enviar o link de redefinição de senha",
+        en: "Unable to send password reset link",
+    },
+    unableToResetPassword: {
+        pt: "Não foi possível redefinir a senha",
+        en: "Unable to reset password",
+    },
     // USER
     userEmailAlreadyExists: {
         pt: "Email já cadastrado",
         en: "Email already exists",
     },
     // PRODUCT
-    cannotDeleteProductWithExistingStock: {
+    cannotDeleteProductWithExistingInventory: {
         pt: "Não é possível excluir um produto com estoque maior que zero",
-        en: "Cannot delete product with existing stock greater than zero",
+        en: "Cannot delete product with existing inventory greater than zero",
     },
     cannotUploadMoreThanTenImages: {
         pt: "Não é possível enviar mais de dez imagens",
@@ -71,14 +79,26 @@ export const errorMessages = {
         pt: "Só é possível enviar uma imagem principal",
         en: "Only one main image is allowed",
     },
+    productSkuAlreadyExists: {
+        pt: "SKU já cadastrado",
+        en: "SKU already exists",
+    },
+    productMpnAlreadyExists: {
+        pt: "Código de fabricante já cadastrado",
+        en: "Manufacturer code already exists",
+    },
+    productGtinAlreadyExists: {
+        pt: "Código de barras já cadastrado",
+        en: "Barcode already exists",
+    },
     // STOCK
-    cannotCreateStockWithZeroAmount: {
+    cannotCreateInventoryWithZeroAmount: {
         pt: "Não é possível criar um estoque com quantidade zero",
-        en: "Cannot create stock with zero amount",
+        en: "Cannot create inventory with zero amount",
     },
     // WAREHOUSE
-    cannotDeleteWarehouseWithExistingStock: {
+    cannotDeleteWarehouseWithExistingInventory: {
         pt: "Não é possível excluir um estoque com quantidade maior que zero",
-        en: "Cannot delete warehouse with existing stock greater than zero",
+        en: "Cannot delete warehouse with existing inventory greater than zero",
     },
 } as const;

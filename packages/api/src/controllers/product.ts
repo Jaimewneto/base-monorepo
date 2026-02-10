@@ -15,7 +15,7 @@ export const base = baseController<"product">(productService);
 export const productController = {
     ...base,
 
-    findManyWithStock: async ({
+    findManyWithInventoriesAndImage: async ({
         limit,
         page,
         where,
@@ -35,7 +35,7 @@ export const productController = {
             sort as OrderBy<Database["product"], "product">[],
         );
 
-        return await productService.findManyWithStock({
+        return await productService.findManyWithInventoriesAndImage({
             limit,
             page,
             where: finalWhere
@@ -43,5 +43,40 @@ export const productController = {
                 : undefined,
             orderBy,
         });
+    },
+
+    findManyWithInventoriesAndImageByWarehouseId: async ({
+        warehouseId,
+        limit,
+        page,
+        where,
+        sort,
+    }: {
+        warehouseId: string;
+        limit: number;
+        page: number;
+        where?: ZodWhereMap["product"];
+        sort?: ZodSortMap["product"];
+    }) => {
+        const finalWhere =
+            where &&
+            buildWhereExpression<"product">(
+                where as Where<Database["product"], "product">,
+            );
+        const orderBy = buildOrderBy<"product">(
+            sort as OrderBy<Database["product"], "product">[],
+        );
+
+        return await productService.findManyWithInventoriesAndImageByWarehouseId(
+            {
+                warehouseId,
+                limit,
+                page,
+                where: finalWhere
+                    ? (eb) => finalWhere(eb) as unknown as SqlBool
+                    : undefined,
+                orderBy,
+            },
+        );
     },
 };

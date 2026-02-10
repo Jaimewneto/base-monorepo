@@ -14,17 +14,19 @@ export type AuditWhereSortZodValidation = z.infer<typeof auditWhereSortSchema>;
 export type AuditWhereZodValidation = AuditWhereSortZodValidation["where"];
 export type AuditSortZodValidation = AuditWhereSortZodValidation["sort"];
 
-// Cardex
-const cardexWhereSortSchema = queryRequestsValidations({
-    tableName: database.cardexTable.name,
-    tableKeys: database.cardexTable.keys,
+// InventoryMovement
+const inventoryMovementWhereSortSchema = queryRequestsValidations({
+    tableName: database.inventoryMovementTable.name,
+    tableKeys: database.inventoryMovementTable.keys,
 }).WhereSortSchema;
 
-export type CardexWhereSortZodValidation = z.infer<
-    typeof cardexWhereSortSchema
+export type InventoryMovementWhereSortZodValidation = z.infer<
+    typeof inventoryMovementWhereSortSchema
 >;
-export type CardexWhereZodValidation = CardexWhereSortZodValidation["where"];
-export type CardexSortZodValidation = CardexWhereSortZodValidation["sort"];
+export type InventoryMovementWhereZodValidation =
+    InventoryMovementWhereSortZodValidation["where"];
+export type InventoryMovementSortZodValidation =
+    InventoryMovementWhereSortZodValidation["sort"];
 
 // Tenant
 const tenantWhereSortSchema = queryRequestsValidations({
@@ -64,15 +66,19 @@ export type ProductImageWhereZodValidation =
 export type ProductImageSortZodValidation =
     ProductImageWhereSortZodValidation["sort"];
 
-// Stock
-const stockWhereSortSchema = queryRequestsValidations({
-    tableName: database.stockTable.name,
-    tableKeys: database.stockTable.keys,
+// Inventory
+const inventoryWhereSortSchema = queryRequestsValidations({
+    tableName: database.inventoryTable.name,
+    tableKeys: database.inventoryTable.keys,
 }).WhereSortSchema;
 
-export type StockWhereSortZodValidation = z.infer<typeof stockWhereSortSchema>;
-export type StockWhereZodValidation = StockWhereSortZodValidation["where"];
-export type StockSortZodValidation = StockWhereSortZodValidation["sort"];
+export type InventoryWhereSortZodValidation = z.infer<
+    typeof inventoryWhereSortSchema
+>;
+export type InventoryWhereZodValidation =
+    InventoryWhereSortZodValidation["where"];
+export type InventorySortZodValidation =
+    InventoryWhereSortZodValidation["sort"];
 
 // User
 const userWhereSortSchema = queryRequestsValidations({
@@ -100,10 +106,10 @@ export type WarehouseSortZodValidation =
 
 export type ZodWhereMap = {
     audit: AuditWhereZodValidation;
-    cardex: CardexWhereZodValidation;
+    inventory_movement: InventoryMovementWhereZodValidation;
     product: ProductWhereZodValidation;
     product_image: ProductImageWhereZodValidation;
-    stock: StockWhereZodValidation;
+    inventory: InventoryWhereZodValidation;
     tenant: TenantWhereZodValidation;
     user: UserWhereZodValidation;
     warehouse: WarehouseWhereZodValidation;
@@ -111,10 +117,10 @@ export type ZodWhereMap = {
 
 export type ZodSortMap = {
     audit: AuditSortZodValidation;
-    cardex: CardexSortZodValidation;
+    inventory_movement: InventoryMovementSortZodValidation;
     product: ProductSortZodValidation;
     product_image: ProductImageSortZodValidation;
-    stock: StockSortZodValidation;
+    inventory: InventorySortZodValidation;
     tenant: TenantSortZodValidation;
     user: UserSortZodValidation;
     warehouse: WarehouseSortZodValidation;

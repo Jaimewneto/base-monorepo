@@ -6,8 +6,8 @@ import { env } from "./env.js";
 import { BadRequestError } from "./error.js";
 import { logger } from "./logger.js";
 import { routes } from "./routes/index.js";
+import { getMessage } from "./utils/messageTranslator.js";
 import { processUtils } from "./utils/process.js";
-import { getErrorMessage } from "./utils/messageTranslator.js";
 
 const server = new Hono()
     .use(
@@ -17,8 +17,10 @@ const server = new Hono()
                 env.NODE_ENV === "production"
                     ? env.FRONTEND_URL_PROD
                     : [env.FRONTEND_URL_DEV, env.FRONTEND_URL_PREVIEW],
+            credentials: true,
             allowHeaders: ["Authorization", "Content-Type"],
             allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+            exposeHeaders: ["Set-Cookie"],
             maxAge: 86400,
         }),
     )
@@ -42,7 +44,7 @@ const server = new Hono()
             {
                 success: false,
                 error: {
-                    message: getErrorMessage({
+                    message: getMessage({
                         key: "internalServerError",
                     }),
                 },

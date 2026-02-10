@@ -1,23 +1,24 @@
 import { Hono } from "hono";
 
-import { cardexController } from "../../controllers/cardex.js";
+import { inventoryMovementController } from "../../controllers/inventoryMovement.js";
 import {
     paginatedResponse,
     successResponse,
 } from "../../utils/http-response.js";
 import { zodValidate } from "../../utils/zodValidator.js";
-import { cardexRequestsValidations } from "../../validations/http-requests/cardex.js";
+import { inventoryMovementRequestsValidations } from "../../validations/http-requests/inventoryMovement.js";
 
-const validations = cardexRequestsValidations();
+const validations = inventoryMovementRequestsValidations();
 
-export const cardexRoutes = new Hono()
+export const inventoryMovementRoutes = new Hono()
     .post(
         "/list",
         zodValidate({ target: "json", schema: validations.findMany }),
         async (c) => {
             const params = c.req.valid("json");
 
-            const { list, count } = await cardexController.findMany(params);
+            const { list, count } =
+                await inventoryMovementController.findMany(params);
 
             return c.json(
                 paginatedResponse({
@@ -44,7 +45,7 @@ export const cardexRoutes = new Hono()
 
             return c.json(
                 successResponse({
-                    data: await cardexController.create(scopedData),
+                    data: await inventoryMovementController.create(scopedData),
                     status: 201,
                 }),
             );

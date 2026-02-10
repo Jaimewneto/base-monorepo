@@ -1,12 +1,12 @@
 import { BadRequestError } from "../error.js";
 import { getCurrentRequestUser } from "../request-context.js";
-import { stockService } from "../services/stock.js";
-import { getErrorMessage } from "../utils/messageTranslator.js";
+import { inventoryService } from "../services/inventory.js";
+import { getMessage } from "../utils/messageTranslator.js";
 import { baseController } from "./baseController.js";
 
-export const base = baseController<"stock">(stockService);
+export const base = baseController<"inventory">(inventoryService);
 
-export const stockController = {
+export const inventoryController = {
     ...base,
 
     createOrUpdate: async ({
@@ -22,11 +22,11 @@ export const stockController = {
 
         if (!user) {
             throw new BadRequestError({
-                message: getErrorMessage({ key: "unauthedUser" }),
+                message: getMessage({ key: "unauthedUser" }),
             });
         }
 
-        return await stockService.createOrUpdate({
+        return await inventoryService.createOrUpdate({
             tenant_id: user.tenant_id,
             warehouse_id,
             product_id,

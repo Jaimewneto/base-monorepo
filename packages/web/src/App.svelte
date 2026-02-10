@@ -5,6 +5,7 @@
   import Navbar from "$lib/components/layout/Navbar.svelte";
   import { Toaster } from "$lib/components/ui/sonner";
   import Login from "./routes/Login.svelte";
+  import PasswordReset from "./routes/PasswordReset.svelte";
   import Product from "./routes/Product.svelte";
   import User from "./routes/User.svelte";
   import Warehouse from "./routes/Warehouse.svelte";
@@ -22,16 +23,17 @@
 
   $effect(() => {
     const path = $router.path;
+  
     const { user } = $authStore;
 
     if (!hydrated) return;
 
-    if (user && path === "/login") {
+    if (user && (path === "/login" || path === "/password-reset")) {
       router.goto("/");
       return;
     }
 
-    if (!user && path !== "/login") {
+    if (!user && (path !== "/login" && path !== "/password-reset")) {
       router.goto("/login");
     }
   });
@@ -57,7 +59,8 @@
     </div>
   </div>
 {:else if hydrated}
-  <Login />
+  <Route path="/password-reset"><PasswordReset /></Route>
+  <Route fallback><Login /></Route>
 {:else}
   <div class="flex items-center justify-center min-h-screen">Carregando...</div>
 {/if}

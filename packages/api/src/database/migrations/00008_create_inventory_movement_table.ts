@@ -4,7 +4,7 @@ import type { Database } from "../schema/index.js";
 
 export async function up(db: Kysely<Database>): Promise<void> {
     await db.schema
-        .createTable("stock")
+        .createTable("inventory_movement")
         .addColumn("id", "uuid", (col) =>
             col.primaryKey().defaultTo(sql`uuidv7()`),
         )
@@ -12,6 +12,11 @@ export async function up(db: Kysely<Database>): Promise<void> {
             "tenant_id",
             "uuid",
             (col) => col.references("tenant.id").notNull(), // foreign key
+        )
+        .addColumn(
+            "user_id",
+            "uuid",
+            (col) => col.references("user.id").notNull(), // foreign key
         )
         .addColumn(
             "product_id",
@@ -23,7 +28,9 @@ export async function up(db: Kysely<Database>): Promise<void> {
             "uuid",
             (col) => col.references("warehouse.id").notNull(), // foreign key
         )
-        .addColumn("amount", "integer", (col) => col.notNull().defaultTo(0))
+        .addColumn("entry", "numeric", (col) => col.notNull().defaultTo(0))
+        .addColumn("exit", "numeric", (col) => col.notNull().defaultTo(0))
+        .addColumn("description", "text", (col) => col.notNull())
         .addColumn("created_at", "timestamptz", (col) =>
             col.defaultTo(sql`now()`),
         )
@@ -35,5 +42,5 @@ export async function up(db: Kysely<Database>): Promise<void> {
 }
 
 export async function down(db: Kysely<Database>): Promise<void> {
-    await db.schema.dropTable("stock").execute();
+    await db.schema.dropTable("inventory_movement").execute();
 }

@@ -1,4 +1,6 @@
 import type {
+    ProductFindManySortArgs,
+    ProductFindManyWhereArgs,
     WarehouseFindManySortArgs,
     WarehouseFindManyWhereArgs,
 } from "$lib/types/findManyArgs";
@@ -110,5 +112,39 @@ export const warehouseRequests = {
             throw new Error(res?.error?.message || "Request failed");
 
         return res.data;
+    },
+    listProducts: async ({
+        id,
+        page,
+        limit,
+        where = { conditions: [] },
+        sort,
+    }: {
+        id: string;
+        page: number;
+        limit: number;
+        where: ProductFindManyWhereArgs;
+        sort: ProductFindManySortArgs;
+    }) => {
+        const req = await authApi.private.warehouse.list.products[":id"].$post({
+            param: {
+                id,
+            },
+            json: {
+                page,
+                limit,
+                where,
+                sort,
+            },
+        });
+
+        if (!req) throw new Error("Request failed");
+
+        const res = await req.json();
+
+        if (!res.success)
+            throw new Error(res?.error?.message || "Request failed");
+
+        return { meta: res.meta, data: res.data };
     },
 };

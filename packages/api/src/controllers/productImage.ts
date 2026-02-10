@@ -1,4 +1,3 @@
-import type { SqlBool } from "kysely";
 import type {
     ProductImage,
     ProductImageCreate,

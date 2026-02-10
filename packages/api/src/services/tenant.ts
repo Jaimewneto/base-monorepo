@@ -20,22 +20,24 @@ export const tenantService = {
         user: UserCreateWithoutTenantId;
     }) => {
         return await client.transaction().execute(async (trx) => {
-            const base = baseService<"tenant">(tenantRepository(trx));
+            const tenantRepositoryInstance = tenantRepository(trx);
             const userRepositoryInstance = userRepository(trx);
 
             const { name, email, password } = data.user;
 
-            const tenant = await base.create(data.tenant);
+            const tenant = await tenantRepositoryInstance.create({ data: data.tenant });
 
             const hashedPassword = await hash(password);
 
             await userRules(trx).validateEmailUniqueness(email);
 
             const user = await userRepositoryInstance.create({
-                email,
-                password: hashedPassword,
-                name,
-                tenant_id: tenant.id,
+                data: {
+                    email,
+                    password: hashedPassword,
+                    name,
+                    tenant_id: tenant.id,
+                },
             });
 
             return {

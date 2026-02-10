@@ -1,17 +1,17 @@
 import { auditRepository } from "./audit.js";
-import { cardexRepository } from "./cardex.js";
+import { inventoryRepository } from "./inventory.js";
+import { inventoryMovementRepository } from "./inventoryMovement.js";
 import { productRepository } from "./product.js";
-import { stockRepository } from "./stock.js";
 import { tenantRepository } from "./tenant.js";
 import { userRepository } from "./user.js";
 import { warehouseRepository } from "./warehouse.js";
 
 export const repositories = {
     audit: auditRepository,
-    cardex: cardexRepository,
+    inventoryMovement: inventoryMovementRepository,
     tenant: tenantRepository,
     product: productRepository,
-    stock: stockRepository,
+    inventory: inventoryRepository,
     user: userRepository,
     warehouse: warehouseRepository,
 };

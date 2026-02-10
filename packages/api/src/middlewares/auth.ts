@@ -10,7 +10,7 @@ import { requestContext } from "../request-context.js";
 
 import type { JWTPayload } from "../types/auth.js";
 
-import { getErrorMessage } from "../utils/messageTranslator.js";
+import { getMessage } from "../utils/messageTranslator.js";
 
 export const authMiddleware = createMiddleware(async (c, next) => {
     const authHeader = c.req.header("authorization");
@@ -18,7 +18,7 @@ export const authMiddleware = createMiddleware(async (c, next) => {
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
         throw new BadRequestError({
             code: 401,
-            message: getErrorMessage({ key: "missingOrInvalidAuthHeader" }),
+            message: getMessage({ key: "missingOrInvalidAuthHeader" }),
             name: "UnauthorizedError",
         });
     }
@@ -43,14 +43,14 @@ export const authMiddleware = createMiddleware(async (c, next) => {
         if (error instanceof jose.errors.JWTExpired) {
             throw new BadRequestError({
                 code: 401,
-                message: getErrorMessage({ key: "expiredToken" }),
+                message: getMessage({ key: "expiredToken" }),
                 name: "ExpiredTokenError",
             });
         }
 
         throw new BadRequestError({
             code: 401,
-            message: getErrorMessage({ key: "invalidToken" }),
+            message: getMessage({ key: "invalidToken" }),
             name: "UnauthorizedError",
         });
     }

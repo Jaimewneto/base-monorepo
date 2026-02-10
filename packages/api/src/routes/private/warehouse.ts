@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-
+import { productController } from "../../controllers/product.js";
 import { warehouseController } from "../../controllers/warehouse.js";
 
 import {
@@ -8,10 +8,11 @@ import {
 } from "../../utils/http-response.js";
 
 import { zodValidate } from "../../utils/zodValidator.js";
-
+import { productRequestsValidations } from "../../validations/http-requests/product.js";
 import { warehouseRequestsValidations } from "../../validations/http-requests/warehouse.js";
 
 const validations = warehouseRequestsValidations();
+const productValidations = productRequestsValidations();
 
 export const warehouseRoutes = new Hono()
     .get(
@@ -41,6 +42,35 @@ export const warehouseRoutes = new Hono()
                     total: count,
                     page: params.page,
                     per_page: params.limit,
+                }),
+            );
+        },
+    )
+    .post(
+        "/list/products/:id",
+        zodValidate({ target: "param", schema: validations.findOneById }),
+        zodValidate({ target: "json", schema: productValidations.findMany }),
+        async (c) => {
+            const { id: warehouseId } = c.req.valid("param");
+            const { limit, page, where, sort } = c.req.valid("json");
+
+            const { list, count } =
+                await productController.findManyWithInventoriesAndImageByWarehouseId(
+                    {
+                        warehouseId,
+                        limit,
+                        page,
+                        where,
+                        sort,
+                    },
+                );
+
+            return c.json(
+                paginatedResponse({
+                    list,
+                    total: count,
+                    page,
+                    per_page: limit,
                 }),
             );
         },
