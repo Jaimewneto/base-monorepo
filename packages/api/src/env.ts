@@ -29,7 +29,7 @@ const envSchema = z.object({
     FRONTEND_URL_PROD: z.url(),
 
     API_EMAIL: z.email(),
-    API_EMAIL_PASSWORD: z.string().min(1),
+    RESEND_API_KEY: z.string().min(1),
 });
 
 const _env = envSchema.safeParse(process.env);

@@ -2,8 +2,6 @@ import { verify } from "@node-rs/argon2";
 
 import * as jose from "jose";
 
-import nodemailer from "nodemailer";
-
 import { env } from "./env.js";
 
 import { BadRequestError } from "./error.js";
@@ -157,27 +155,26 @@ export const sendPasswordResetLink = async (email: string) => {
         .sign(new TextEncoder().encode(env.PASSWORD_RESET_JWT_SECRET));
 
     try {
-        const transporter = nodemailer.createTransport({
-            service: "gmail", // Or another email service
-            auth: {
-                user: env.API_EMAIL,
-                pass: env.API_EMAIL_PASSWORD,
-            },
-        });
-
         const baseUrl =
             env.NODE_ENV === "development"
                 ? env.FRONTEND_URL_DEV
                 : env.FRONTEND_URL_PROD;
 
         const url = `${baseUrl}/password-reset?passwordResetToken=${passwordResetToken}`;
-
-        await transporter.sendMail({
-            from: `"My App" <${env.API_EMAIL}>`, // Preferebly set a env variable for App name
-            to: email,
-            subject: getMessage({ key: "passwordResetEmailTitle" }),
-            text: url,
-        });
+        
+        await fetch("https://api.resend.com/emails",{
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${env.RESEND_API_KEY}`,
+            },
+            body: JSON.stringify({
+                from: env.API_EMAIL,
+                to: email,
+                subject: getMessage({ key: "passwordResetEmailTitle" }),
+                text: url
+            })
+        })
     } catch (error) {
         logger.error(error);
         throw new BadRequestError({
