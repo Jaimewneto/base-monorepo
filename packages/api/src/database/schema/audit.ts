@@ -12,6 +12,7 @@ export interface AuditTable {
     tenant_id: string;
     user_id: string;
     table: string;
+    entity_id: string;
     previous_value: string | null;
     new_value: string;
     created_at: ColumnType<Date, string | undefined, never>;

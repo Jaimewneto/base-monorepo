@@ -54,6 +54,7 @@ export const baseService = <K extends keyof Database>(
                     tenant_id: user.tenant_id,
                     user_id: user.id,
                     table: repository.getTableName(),
+                    entity_id: (result as any).id,
                     new_value: JSON.stringify(result),
                 },
             });
@@ -78,6 +79,7 @@ export const baseService = <K extends keyof Database>(
                     tenant_id: user.tenant_id,
                     user_id: user.id,
                     table: repository.getTableName(),
+                    entity_id: params.id,
                     previous_value: JSON.stringify(
                         await repository.findOneById(params.id),
                     ),
@@ -102,6 +104,7 @@ export const baseService = <K extends keyof Database>(
                     tenant_id: user.tenant_id,
                     user_id: user.id,
                     table: repository.getTableName(),
+                    entity_id: id,
                     previous_value: JSON.stringify(previousValue),
                     new_value: JSON.stringify({
                         ...previousValue,
