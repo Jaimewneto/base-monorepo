@@ -32,10 +32,12 @@ export const tenantService = {
             await userRules(trx).validateEmailUniqueness(email);
 
             const user = await userRepositoryInstance.create({
-                email,
-                password: hashedPassword,
-                name,
-                tenant_id: tenant.id,
+                data: {
+                    email,
+                    password: hashedPassword,
+                    name,
+                    tenant_id: tenant.id,
+                },
             });
 
             return {

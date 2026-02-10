@@ -3,6 +3,7 @@ import type {
     Insertable,
     Selectable,
     SqlBool,
+    Transaction,
     Updateable,
 } from "kysely";
 import { sql } from "kysely";
@@ -20,6 +21,8 @@ export const baseRepository = <K extends keyof Database>({
     db?: typeof client;
     tableName: K;
 }) => {
+    const getTableName = () => tableName;
+
     const findOneById = async (
         id: string,
     ): Promise<Selectable<Database[K]> | null> => {
@@ -119,9 +122,15 @@ export const baseRepository = <K extends keyof Database>({
         };
     };
 
-    const create = async (
-        data: Insertable<Database[K]>,
-    ): Promise<Selectable<Database[K]>> => {
+    const create = async ({
+        data,
+        client,
+    }: {
+        data: Insertable<Database[K]>;
+        client?: Transaction<Database>;
+    }): Promise<Selectable<Database[K]>> => {
+        const dbClient = client || db;
+
         const user = getCurrentRequestUser();
 
         if (
@@ -134,7 +143,7 @@ export const baseRepository = <K extends keyof Database>({
             data.tenant_id = user.tenant_id;
         }
 
-        return await db
+        return await dbClient
             .insertInto(tableName)
             .values(data)
             .returningAll()
@@ -144,10 +153,14 @@ export const baseRepository = <K extends keyof Database>({
     const updateById = async ({
         id,
         data,
+        client,
     }: {
         id: string;
         data: Updateable<Database[K]>;
+        client?: Transaction<Database>;
     }): Promise<Selectable<Database[K]>> => {
+        const dbClient = client || db;
+
         const user = getCurrentRequestUser();
 
         if (
@@ -160,7 +173,7 @@ export const baseRepository = <K extends keyof Database>({
             data.tenant_id = user.tenant_id;
         }
 
-        let query = db
+        let query = dbClient
             .updateTable(tableName)
             // @ts-expect-error
             .set(data)
@@ -173,10 +186,18 @@ export const baseRepository = <K extends keyof Database>({
         return await query.executeTakeFirst();
     };
 
-    const deleteById = async (id: string): Promise<Selectable<Database[K]>> => {
+    const deleteById = async ({
+        id,
+        client,
+    }: {
+        id: string;
+        client?: Transaction<Database>;
+    }): Promise<Selectable<Database[K]>> => {
+        const dbClient = client || db;
+
         const user = getCurrentRequestUser();
 
-        let query = db
+        let query = dbClient
             .updateTable(tableName)
             // @ts-expect-error
             .set({ deleted_at: new Date() })
@@ -190,6 +211,7 @@ export const baseRepository = <K extends keyof Database>({
     };
 
     const repository = {
+        getTableName,
         findOneById,
         findOneByCondition,
         findMany,

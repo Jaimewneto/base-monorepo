@@ -10,6 +10,7 @@ import type {
 export interface InventoryMovementTable {
     id: Generated<string>;
     tenant_id: string;
+    user_id: string;
     product_id: string;
     warehouse_id: string;
     entry: number;

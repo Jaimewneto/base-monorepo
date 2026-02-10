@@ -11,6 +11,7 @@ export interface AuditTable {
     id: Generated<string>;
     tenant_id: string;
     user_id: string;
+    table: string;
     previous_value: string | null;
     new_value: string;
     created_at: ColumnType<Date, string | undefined, never>;

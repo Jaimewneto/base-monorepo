@@ -53,7 +53,7 @@ export const productImageService = {
                 const exists = data.find((img) => img.id === item.id);
 
                 if (!exists) {
-                    await repo.deleteById(item.id);
+                    await repo.deleteById({ id: item.id });
                 }
             }
 
@@ -75,7 +75,7 @@ export const productImageService = {
                     continue;
                 }
 
-                await repo.create(item as ProductImageCreate);
+                await repo.create({ data: item as ProductImageCreate });
             }
         });
 

@@ -70,7 +70,7 @@ export const productService = {
     create: async (data: ProductCreate) => {
         await productRules({ db: client }).validateCreate(data);
 
-        return await productRepository(client).create(data);
+        return await productRepository(client).create({ data });
     },
 
     update: async ({ id, data }: { id: string; data: ProductUpdate }) => {

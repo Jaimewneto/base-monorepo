@@ -14,7 +14,7 @@ export const warehouseService = {
 
     deleteById: async (id: string) => {
         return await client.transaction().execute(async (trx) => {
-            const base = baseService<"warehouse">(warehouseRepository(trx));
+            const warehouseRepositoryInstance = warehouseRepository(trx);
             const inventoryRepositoryInstance = inventoryRepository(trx);
 
             const inventorys = await inventoryRepositoryInstance.findMany({
@@ -35,7 +35,10 @@ export const warehouseService = {
                 });
             }
 
-            return await base.deleteById(id);
+            return await warehouseRepositoryInstance.deleteById({
+                id,
+                client: trx,
+            });
         });
     },
 };

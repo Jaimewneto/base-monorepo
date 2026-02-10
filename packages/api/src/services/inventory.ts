@@ -4,6 +4,7 @@ import { client } from "../database/client.js";
 import { inventoryRepository } from "../database/repositories/inventory.js";
 import { inventoryMovementRepository } from "../database/repositories/inventoryMovement.js";
 import { BadRequestError } from "../error.js";
+import { getCurrentRequestUserOrThrow } from "../request-context.js";
 import { getMessage } from "../utils/messageTranslator.js";
 import { baseService } from "./baseService.js";
 
@@ -27,6 +28,8 @@ export const inventoryService = {
             const inventoryRepo = inventoryRepository(trx);
             const inventoryMovementRepo = inventoryMovementRepository(trx);
 
+            const user = getCurrentRequestUserOrThrow();
+
             const existingInventory = await inventoryRepo.findOneByCondition(
                 (eb) =>
                     eb.and([
@@ -40,23 +43,29 @@ export const inventoryService = {
 
                 if (amountDifference > 0) {
                     await inventoryMovementRepo.create({
-                        tenant_id: existingInventory.tenant_id,
-                        warehouse_id,
-                        product_id,
-                        description: "Alteração manual de estoque", // TODO: Description by language
-                        entry: amountDifference,
-                        exit: 0,
+                        data: {
+                            tenant_id: existingInventory.tenant_id,
+                            user_id: user.id,
+                            warehouse_id,
+                            product_id,
+                            description: "Alteração manual de estoque", // TODO: Description by language
+                            entry: amountDifference,
+                            exit: 0,
+                        },
                     });
                 }
 
                 if (amountDifference < 0) {
                     await inventoryMovementRepo.create({
-                        tenant_id: existingInventory.tenant_id,
-                        warehouse_id,
-                        product_id,
-                        description: "Alteração manual de estoque", // TODO: Description by language
-                        entry: 0,
-                        exit: Math.abs(amountDifference),
+                        data: {
+                            tenant_id: existingInventory.tenant_id,
+                            user_id: user.id,
+                            warehouse_id,
+                            product_id,
+                            description: "Alteração manual de estoque", // TODO: Description by language
+                            entry: 0,
+                            exit: Math.abs(amountDifference),
+                        },
                     });
                 }
 
@@ -79,19 +88,24 @@ export const inventoryService = {
             }
 
             await inventoryMovementRepo.create({
-                tenant_id,
-                warehouse_id,
-                product_id,
-                description: "Alteração manual de estoque", // TODO: Description by language
-                entry: amount,
-                exit: 0,
+                data: {
+                    tenant_id,
+                    user_id: user.id,
+                    warehouse_id,
+                    product_id,
+                    description: "Alteração manual de estoque", // TODO: Description by language
+                    entry: amount,
+                    exit: 0,
+                },
             });
 
             return await inventoryRepo.create({
-                tenant_id,
-                warehouse_id,
-                product_id,
-                amount,
+                data: {
+                    tenant_id,
+                    warehouse_id,
+                    product_id,
+                    amount,
+                },
             });
         });
     },

@@ -18,6 +18,7 @@ export async function up(db: Kysely<Database>): Promise<void> {
             "uuid",
             (col) => col.references("user.id").notNull(), // foreign key
         )
+        .addColumn("table", "text", (col) => col.notNull())
         .addColumn("previous_value", "text")
         .addColumn("new_value", "text", (col) => col.notNull())
         .addColumn("created_at", "timestamptz", (col) =>

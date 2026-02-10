@@ -15,7 +15,9 @@ export const userService = {
     ...base,
 
     findOneByEmail: async (email: string) => {
-        return await base.findOneByCondition(
+        const userRepositoryInstance = userRepository();
+
+        return await userRepositoryInstance.findOneByCondition(
             (eb) =>
                 eb.and({
                     "user.email": email,
@@ -30,7 +32,9 @@ export const userService = {
 
         user.password = hashedPassword;
 
-        return await base.create(user);
+        const userRepositoryInstance = userRepository();
+
+        return await userRepositoryInstance.create({ data: user });
     },
 
     updateById: async (params: { id: string; data: UserUpdate }) => {
@@ -40,6 +44,8 @@ export const userService = {
             params.data.password = hashedPassword;
         }
 
-        return await base.updateById(params);
+        const userRepositoryInstance = userRepository();
+
+        return await userRepositoryInstance.updateById(params);
     },
 };
