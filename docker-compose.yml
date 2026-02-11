@@ -1,0 +1,23 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: packages/api/Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - packages/api/.env
+    depends_on:
+      - db
+
+  db:
+    image: postgres:18
+    env_file:
+      - .env.db
+    volumes:
+      - pgdata:/var/lib/postgresql
+    ports:
+      - "5432:5432"
+
+volumes:
+  pgdata:
