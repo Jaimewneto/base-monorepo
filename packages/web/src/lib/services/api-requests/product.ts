@@ -148,4 +148,18 @@ export const productRequests = {
 
         return res.data;
     },
+    getPartDescriptionWithAi: async (mpn: string) => {
+        const req = await authApi.private.product["get-description-by-mpn"][":mpn"].$get({
+            param: { mpn },
+        });
+
+        if (!req) throw new Error("Request failed");
+
+        const res = await req.json();
+
+        if (!res.success)
+            throw new Error(res?.error?.message || "Request failed");
+
+        return res.data;
+    },
 };

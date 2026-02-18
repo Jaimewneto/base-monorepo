@@ -99,4 +99,19 @@ export const productRoutes = new Hono()
                 }),
             );
         },
+    )
+    .get(
+        "/get-description-by-mpn/:mpn",
+        zodValidate({ target: "param", schema: validations.findDescriptionByMpn }),
+        async (c) => {
+            const { mpn } = c.req.valid("param");
+
+            const data = await productController.findDescriptionByMpn(mpn);
+
+            return c.json(
+                successResponse({
+                    data,
+                }),
+            );
+        },
     );

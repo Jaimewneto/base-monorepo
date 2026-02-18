@@ -30,6 +30,8 @@ const envSchema = z.object({
 
     API_EMAIL: z.email(),
     RESEND_API_KEY: z.string().min(1),
+
+    GEMINI_API_KEY: z.string().min(1),
 });
 
 const _env = envSchema.safeParse(process.env);
