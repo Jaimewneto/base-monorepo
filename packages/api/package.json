@@ -21,6 +21,7 @@
         "db:migrate": "tsx src/database/scripts/migrate.ts"
     },
     "dependencies": {
+        "@google/genai": "^1.41.0",
         "@hono/node-server": "^1.19.9",
         "@hono/zod-validator": "^0.7.6",
         "@node-rs/argon2": "^2.0.2",

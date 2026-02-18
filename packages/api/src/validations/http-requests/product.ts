@@ -47,11 +47,16 @@ export const productRequestsValidations = () => {
         id: z.uuid(),
     });
 
+    const findDescriptionByMpn = z.object({
+        mpn: z.string(),
+    });
+
     return {
         findOneById,
         findMany,
         create,
         updateById,
         deleteById,
+        findDescriptionByMpn,
     };
 };

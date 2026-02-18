@@ -91,6 +91,14 @@ export const errorMessages = {
         pt: "Código de barras já cadastrado",
         en: "Barcode already exists",
     },
+    errorFetchingProductDescription: {
+        pt: "Erro ao buscar descrição do produto",
+        en: "Error fetching product description",
+    },
+    noProductDescriptionFound: {
+        pt: "Nenhuma descrição encontrada",
+        en: "No product description found",
+    },
     // STOCK
     cannotCreateInventoryWithZeroAmount: {
         pt: "Não é possível criar um estoque com quantidade zero",

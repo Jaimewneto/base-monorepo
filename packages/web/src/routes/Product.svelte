@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { toast } from "svelte-sonner";
-  import { Loader2, Pencil, Save, Trash2, PackagePlus, Warehouse, X } from "@lucide/svelte";
+  import { Loader2, Pencil, Save, Trash2, PackagePlus, Warehouse, X, Sparkles } from "@lucide/svelte";
 
   import { Button } from "$lib/components/ui/button";
   import * as Table from "$lib/components/ui/table";
@@ -86,6 +86,9 @@
   let productImagefiles = $state<File[]>([]);
   let productImages = $state<ProductImageInsertMany>([]);
   let renderedImages = $state<ImageItem[]>([]);
+
+  // Estado para carregamento da descrição
+  let fetchingDescription = $state(false);
 
   function openInventoryDetails(product: ProductWithInventories) {
     selectedProductInventories = product;
@@ -261,8 +264,18 @@
     }
   }
 
-  function onImagesChange(files: File[]) {
-    productImagefiles = files;
+  async function fetchDescriptionWithAi() {
+    if (!formData.mpn) return;
+    fetchingDescription = true;
+    try {
+      const description = await productRequests.getPartDescriptionWithAi(formData.mpn);
+      formData.description = description;
+      toast.success("Descrição preenchida com IA!");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erro ao buscar descrição");
+    } finally {
+      fetchingDescription = false;
+    }
   }
 
   onMount(loadProducts);
@@ -332,8 +345,24 @@
         </div>
 
         <div class="grid gap-2">
-          <Label for="sku">Cód. fabricante</Label>
-          <Input id="sku" bind:value={formData.mpn} />
+          <Label for="mpn">Cód. fabricante</Label>
+          <div class="flex gap-2">
+            <Input id="mpn" bind:value={formData.mpn} class="flex-1" />
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              title="Buscar descrição com IA"
+              disabled={!formData.mpn || fetchingDescription}
+              onclick={fetchDescriptionWithAi}
+            >
+              {#if fetchingDescription}
+                <Loader2 class="h-4 w-4 animate-spin" />
+              {:else}
+                <Sparkles class="h-4 w-4" />
+              {/if}
+            </Button>
+          </div>
         </div>
 
         <div class="grid gap-2">

@@ -10,6 +10,8 @@ import { buildOrderBy, buildWhereExpression } from "../utils/http-query.js";
 
 import { baseController } from "./baseController.js";
 
+import { getPartDescriptionWithAi } from "../services/ai/product.js";
+
 export const base = baseController<"product">(productService);
 
 export const productController = {
@@ -78,5 +80,8 @@ export const productController = {
                 orderBy,
             },
         );
+    },
+    findDescriptionByMpn: async (partNumber: string) => {
+        return await getPartDescriptionWithAi(partNumber);
     },
 };
