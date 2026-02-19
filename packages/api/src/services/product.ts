@@ -73,8 +73,8 @@ export const productService = {
         return await productRepository(client).create({ data });
     },
 
-    update: async ({ id, data }: { id: string; data: ProductUpdate }) => {
-        await productRules({ db: client }).validateUpdate(data);
+    updateById: async ({ id, data }: { id: string; data: ProductUpdate }) => {
+        await productRules({ db: client }).validateUpdate({ id, data });
 
         return await productRepository(client).updateById({ id, data });
     },

@@ -107,15 +107,15 @@ export const productRules = ({ db }: { db: Kysely<Database> }) => ({
         if (product.gtin)
             await validateGtinUniqueness({ gtin: product.gtin, db });
     },
-    validateUpdate: async (product: ProductUpdate) => {
-        if (product.sku)
+    validateUpdate: async ({ id, data }: { id: string; data: ProductUpdate }) => {
+        if (data.sku)
             await validateSkuUniqueness({
-                sku: product.sku,
-                id: product.id,
+                sku: data.sku,
+                id,
                 db,
             });
-        if (product.mpn) await validateMpnUniqueness({ mpn: product.mpn, db });
-        if (product.gtin)
-            await validateGtinUniqueness({ gtin: product.gtin, db });
+        if (data.mpn) await validateMpnUniqueness({ mpn: data.mpn, db });
+        if (data.gtin)
+            await validateGtinUniqueness({ gtin: data.gtin, db });
     },
 });
